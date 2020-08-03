@@ -10,6 +10,7 @@ import javax.sql.DataSource;
 
 @Configuration
 public class ApplicationConfiguration {
+
     @Value("${spring.datasource.username}")
     private String springUsername;
 
