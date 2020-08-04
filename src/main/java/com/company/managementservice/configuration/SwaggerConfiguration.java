@@ -17,15 +17,10 @@ public class SwaggerConfiguration {
         return new Docket(DocumentationType.SWAGGER_2)
                 .select()
                 .apis(RequestHandlerSelectors.basePackage(
-                        "controllerpackagename"))//resquest and resposnebase, ssee personalisation service
+                        "controllerpackagename"))
                 .paths(PathSelectors.any())
                 .build();
     }
-    /*@ApiResponses({@ApiResponse(code = 201, response = ServiceResponse.class, message = "Created"),
-      @ApiResponse(code = 400, response = ServiceResponse.class, message = "Bad Request"),
-      @ApiResponse(code = 409, response = ServiceResponse.class, message = "Conflict"),
-      @ApiResponse(code = 500, response = ServiceResponse.class, message = "Internal Server Error")
-  })*/
 
 }
 

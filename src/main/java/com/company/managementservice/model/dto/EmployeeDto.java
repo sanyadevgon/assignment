@@ -1,56 +1,57 @@
 package com.company.managementservice.model.dto;
 
-import com.company.managementservice.model.entity.Employee;
 import com.company.managementservice.model.enums.DesignationType;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.sun.istack.NotNull;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
+import javax.validation.constraints.*;
 import java.time.LocalDate;
 
-
 @Data
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class EmployeeDto {
 
+    @NotBlank(message = "Please provide a name")
     @JsonProperty("firstName")
     private String firstName;
 
     @JsonProperty("lastName")
     private String lastName;
 
-    @NotNull
+    @NotBlank(message = "Please provide an email")
+    @Email
     @JsonProperty("emailId")
     private String emailId;
 
-    @NotNull
+    @NotBlank(message = "Please provide an address")
     @JsonProperty("address")
     private String address;
 
-    //designation ENUMS,  status ENUM*
-
+    @Pattern(regexp = "^$|[0-9]{10}")
     @JsonProperty("phone")
     private String phone;
 
+    @Min(value = 18)
+    @JsonProperty("age")
+    private Integer age;
+
+    @NotBlank(message = "Please provide a designation of employee")
     @JsonProperty("designation")
     private DesignationType designationType;
 
     @JsonProperty("is_active")
-    private Boolean isActive=true;
+    private Boolean isActive = true;
 
     @JsonProperty("hireDate")
-    private LocalDate hireDate=LocalDate.now();
+    private LocalDate hireDate = LocalDate.now();
 
     @JsonProperty("manager_id")
     private Long managerId;
 
     private Long id;
 
-   /* @JsonProperty("terminatedDate")//On termination data upadated otherwise null
-    private LocalDate terminatedDate;*/
+    @JsonProperty("terminatedDate")//On termination data upadated otherwise null
+    private LocalDate terminatedDate;
 }

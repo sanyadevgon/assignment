@@ -13,53 +13,49 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+
 @RestController
 @Log4j2
-@RequestMapping(value = "/organisation")
+@RequestMapping(value = "/organisation", consumes = MediaType.APPLICATION_JSON_VALUE)
 public class OrganisationController {
 
     @Autowired
-    OrganisationService organisationService;
+    private OrganisationService organisationService;
 
-    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> postOrganisationDetails(
-            @RequestBody OrganisationDto organisationDto) throws EmptyBodyException {
+    @PostMapping
+    public ResponseEntity<?> saveOrganisationDetails(
+            @Valid @RequestBody OrganisationDto organisationDto) throws EmptyBodyException {
         if (organisationDto.getName() == null || organisationDto.getHeadOfficeLocation() == null)
             throw new EmptyBodyException("Name and location cannot be empty fields");
 
         log.info(
-                "OrganisationController : save Organisation Details : Received Request to save Organisation" +
+                "OrganisationController : saveOrganisationDetails : Received Request to save Organisation Details" +
                 organisationDto);
-        OrganisationDto organisationDto1=organisationService.saveOrganisation(organisationDto);
         return new ServiceResponse<BaseMessageResponse>(
-                new BaseMessageResponse("Saved Successfully "+organisationDto1.toString(), HttpStatus.OK, true));
+                new BaseMessageResponse(
+                        "Saved Successfully " + organisationService.saveOrganisation(organisationDto).toString(),
+                        HttpStatus.OK, true));
 
     }
 
     @GetMapping(value = "/{id}")
-    public ResponseEntity<?> retrieveOrganisation(@PathVariable Integer id) throws NotFoundException {
-        log.info("OrganisationController : get Organisation Details : Received Request to get Organisation", id);
+    public ResponseEntity<?> getOrganisation(@PathVariable Integer id) throws NotFoundException {
+        log.info("OrganisationController : getOrganisationDetails : Received Request to get Organisation Details", id);
         return new ServiceResponse<>(
                 organisationService.getOrganisation(id), HttpStatus.OK);
 
     }
 
-    /*@DeleteMapping("/{id}")
-    public ResponseEntity<?> deletedOrganisation(@PathVariable Integer id) throws NotFoundExcep
-    ganisation Details : Received Request to delete Organisation", id);
-        organisationService.deleteOrganisation(id);
-        return new ServiceResponse<BaseMessageResponse>(
-                new BaseMessageResponse("Deleted Successfully", HttpStatus.OK, true));
-    }*/
-
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateOrganisation(@RequestBody OrganisationDto organisationDto,
-                                                @PathVariable Integer id) throws NotFoundException {
-
-        log.info("OrganisationController : Put Organisation Details : Received Request to put Organisation", id);
-        return new ServiceResponse<>(
-                organisationService.updateOrganisation(organisationDto, id), HttpStatus.OK);
-
+    public ResponseEntity<?> putOrganisation(@Valid @RequestBody OrganisationDto organisationDto,
+                                             @PathVariable Integer id) throws NotFoundException {
+        log.info("OrganisationController : PutOrganisationDetails : Received Request to put Organisation Details", id);
+        return new ServiceResponse<BaseMessageResponse>(
+                new BaseMessageResponse(
+                        "Updated Successfully " +
+                        organisationService.updateOrganisation(organisationDto, id).toString(),
+                        HttpStatus.OK, true));
     }
 
 }

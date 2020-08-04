@@ -2,24 +2,23 @@ package com.company.managementservice.model.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.sun.istack.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.Column;
+import javax.validation.constraints.NotBlank;
 
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@EqualsAndHashCode
 public class DepartmentDto {
 
-    @NotNull
+    @NotBlank(message = "Please provide a description for department")
     @JsonProperty("description")
     private String description;
 
-    @NotNull
+    @NotBlank(message = "Please provide a description for department")
     @JsonProperty("address")
     private String address;
 

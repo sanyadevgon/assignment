@@ -1,26 +1,30 @@
 package com.company.managementservice.model.dto;
 
+import com.company.managementservice.model.entity.Department;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.sun.istack.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
+import java.util.Set;
 
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@EqualsAndHashCode
 public class OrganisationDto {
 
-    @NotNull
+    @NotBlank(message = "Please provide a name")
     @JsonProperty("name")
     private String name;
 
+    @NotBlank(message = "Please provide a type for organisation")
     @JsonProperty("type")
     private String type;
 
-    @NotNull
+    @NotBlank(message = "Please provide a location")
     @JsonProperty("headOfficeLocation")
     private String headOfficeLocation;
 
@@ -34,4 +38,6 @@ public class OrganisationDto {
     private Boolean isActive;
 
     private Integer id;
+
+    private Set<Department> department;
 }

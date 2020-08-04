@@ -1,6 +1,5 @@
 package com.company.managementservice.controller;
 
-
 import com.company.managementservice.exception.NotFoundException;
 import com.company.managementservice.model.dto.DepartmentDto;
 import com.company.managementservice.model.response.BaseMessageResponse;
@@ -12,51 +11,55 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+
 @Log4j2
 @RestController()
 @RequestMapping(value = "/department", consumes = MediaType.APPLICATION_JSON_VALUE)
 public class DepartmentController {
 
     @Autowired
-    DepartmentService departmentService;
+    private DepartmentService departmentService;
 
-    @PostMapping(value = "/save")
-    public ServiceResponse<?> postDepartmentDetails(@RequestBody DepartmentDto departmentDto) {
+    @PostMapping
+    public ServiceResponse<?> saveDepartmentDetails(@Valid @RequestBody DepartmentDto departmentDto) {
         log.info(
-                "DepartmentController : save Department Details : Received Request to save department" +
+                "DepartmentController : saveDepartmentDetails : Received Request to save department Details" +
                 departmentDto.toString());
-        DepartmentDto departmentDto1=departmentService.saveDepartment(departmentDto);
+        //DepartmentDto departmentDto1 = departmentService.saveDepartment(departmentDto);
         return new ServiceResponse<BaseMessageResponse>(
-                new BaseMessageResponse("Saved Successfully"+departmentDto1.toString(), HttpStatus.OK, true));
+                new BaseMessageResponse("Saved Successfully" + departmentService.saveDepartment(departmentDto).toString(), HttpStatus.OK, true));
 
     }
 
     @GetMapping(value = "/{id}")
-    public ServiceResponse<?> retrieveDepartment(@PathVariable Long id) throws NotFoundException {
-        log.info("DepartmentController : Get Department Details : Received Request to get Department", id);
+    public ServiceResponse<?> getDepartmentDetails(@PathVariable Long id) throws NotFoundException {
+        log.info("DepartmentController : getDepartmentDetails : Received Request to get Department Details", id);
         return new ServiceResponse<>(
                 departmentService.getDepartment(id), HttpStatus.OK);
 
     }
 
-    /*@DeleteMapping("/{id}")
-    public ServiceResponse<?> deleteDepartment(@PathVariable long id) throws NotFoundException {
-
-        departmentService.deleteDepartment(id);
-        return new ServiceResponse<BaseMessageResponse>(
-                new BaseMessageResponse("Deleted Successfully", HttpStatus.OK, true));
-
-    }*/
-
     @PutMapping("/{id}")
-    public ServiceResponse<?> updateDepartment(@RequestBody DepartmentDto departmentDto, @PathVariable long id)
+    public ServiceResponse<?> putDepartmentDetails(@Valid @RequestBody DepartmentDto departmentDto, @PathVariable long id)
             throws NotFoundException {
-        log.info("DepartmentController : Put Department Details : Received Request to put Department", id);
-        departmentService.updateDepartment(departmentDto, id);
-        return  new ServiceResponse<BaseMessageResponse>(
-                new BaseMessageResponse("Saved Successfully", HttpStatus.OK, true));
+        log.info("DepartmentController : putDepartmentDetails : Received Request to put Department Details ", id);
+        return new ServiceResponse<BaseMessageResponse>(
+                new BaseMessageResponse(
+                        "Updated Successfully " + departmentService.updateDepartment(departmentDto, id).toString(),
+                        HttpStatus.OK, true));
+    }
+
+    @PostMapping("/{id}")
+    public ServiceResponse<?> postDepartmentInCompany(@Valid @RequestBody DepartmentDto departmentDto, @PathVariable Integer id)
+            throws NotFoundException {
+        log.info("DepartmentController : postDepartmentInCompany : Received Request to post Department In Company ", id);
+        //departmentService.postDepartmentInCompany(departmentDto, id);
+        return new ServiceResponse<BaseMessageResponse>(
+                new BaseMessageResponse("Saved Successfully" +  departmentService.postDepartmentInCompany(departmentDto, id).toString(), HttpStatus.OK, true));
 
     }
+
 
 
 

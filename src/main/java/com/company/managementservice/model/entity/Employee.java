@@ -35,6 +35,9 @@ public class Employee extends AbstractEntity<Long> implements Serializable {
     @Column(name = "phone")
     private String phone;
 
+    @Column(name="age")
+    private Integer age;
+
     @Enumerated
     private DesignationType designationType;
 

@@ -35,12 +35,23 @@ public class CustomExceptionHandler {
                 HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(value = Exception.class)
-    public ServiceResponse<?> exception(Exception ex) {
-        log.info("Unable to complete request, Exception occurred: {}", ex.getMessage());
+    @ExceptionHandler(value = ConstraintViolationException.class)
+    public ServiceResponse<?> ConstraintViolationException(ConstraintViolationException ex) {
+        log.info("Unable to complete request. Exception occurred: {}", ex.getMessage());
         return new ServiceResponse<BaseMessageResponse>(
-                new BaseMessageResponse<>(ex.getMessage(), HttpStatus.BAD_REQUEST, false));
+                new BaseMessageResponse<>(ex.getMessage(), HttpStatus.BAD_REQUEST, false),
+                HttpStatus.BAD_REQUEST);
     }
+
+    @ExceptionHandler(value = MethodArgumentNotValidException.class)
+    public ServiceResponse<?> MethodArgumentNotValidException(MethodArgumentNotValidException ex) {
+        log.info("Unable to complete request. Exception occurred: {}", ex.getMessage());
+        return new ServiceResponse<BaseMessageResponse>(
+                new BaseMessageResponse<>(ex.getMessage(), HttpStatus.BAD_REQUEST, false),
+                HttpStatus.BAD_REQUEST);
+    }
+
+
 
 }
 

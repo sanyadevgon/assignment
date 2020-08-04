@@ -1,20 +1,18 @@
 package com.company.managementservice.service;
 
-
-
 import com.company.managementservice.exception.NotFoundException;
-import com.company.managementservice.model.dto.DepartmentDto;
 import com.company.managementservice.model.dto.OrganisationDto;
-import com.company.managementservice.model.entity.Department;
 import com.company.managementservice.model.entity.Organisation;
 import com.company.managementservice.repo.OrganisationRepo;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
-@Component
+@Service
+@Transactional
 public class OrganisationService {
 
     @Autowired
@@ -24,9 +22,9 @@ public class OrganisationService {
 
     public OrganisationDto saveOrganisation(OrganisationDto organisationDto) {
 
-        Organisation organisation=repo.save(modelMapper.map(organisationDto, Organisation.class));
+        Organisation organisation = repo.save(modelMapper.map(organisationDto, Organisation.class));
         organisationDto.setId(organisation.getId());
-        return modelMapper.map(organisation,OrganisationDto.class);
+        return modelMapper.map(organisation, OrganisationDto.class);
 
     }
 
@@ -35,16 +33,8 @@ public class OrganisationService {
         if (!organisation.isPresent())
             throw new NotFoundException("NOT FOUND organisation id-" + id);
 
-        return modelMapper.map(organisation.get(),OrganisationDto.class);
+        return modelMapper.map(organisation.get(), OrganisationDto.class);
     }
-
-
-    /*public void deleteOrganisation(Integer id) throws NotFoundException {
-        Optional<Organisation> organisation = repo.findById(id);
-        if (!organisation.isPresent())
-            throw new NotFoundException("NOT FOUND organisation id-" + id);
-        repo.deleteById(id);
-    }*/
 
 
     public OrganisationDto updateOrganisation(OrganisationDto organisationDto, Integer id) throws NotFoundException {
@@ -56,7 +46,7 @@ public class OrganisationService {
         organisationInfo.setCreatedAt(organisation.get().getCreatedAt());
         organisationInfo.setCreatedBy(organisation.get().getCreatedBy());
         repo.save(organisationInfo);
-        return modelMapper.map(organisationInfo,OrganisationDto.class);
+        return modelMapper.map(organisationInfo, OrganisationDto.class);
 
     }
 

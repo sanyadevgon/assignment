@@ -1,19 +1,18 @@
 package com.company.managementservice.controller;
 
-
 import com.company.managementservice.exception.NotFoundException;
-import com.company.managementservice.model.dto.DepartmentDto;
 import com.company.managementservice.model.dto.EmployeeDto;
-import com.company.managementservice.model.entity.Employee;
 import com.company.managementservice.model.response.BaseMessageResponse;
 import com.company.managementservice.model.response.ServiceResponse;
-import com.company.managementservice.service.DepartmentService;
 import com.company.managementservice.service.EmployeeService;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
 
 @Log4j2
 @RestController()
@@ -21,46 +20,50 @@ import org.springframework.web.bind.annotation.*;
 public class EmployeeController {
 
     @Autowired
-    EmployeeService employeeService;
+    private EmployeeService employeeService;
 
-    @PostMapping(value = "/save")
-    public ServiceResponse<?> postEmployeeDetails(@RequestBody EmployeeDto employeeDto) {
+    @PostMapping
+    public ServiceResponse<?> postEmployeeDetails(@Valid @RequestBody EmployeeDto employeeDto) {
         log.info(
-                "EmployeeController : save Employee Details : Received Request to save Employee" +
+                "EmployeeController : postEmployeeDetails : Received Request to post Employee Details" +
                 employeeDto.toString());
-        EmployeeDto employeeDto1=employeeService.saveEmployee(employeeDto);
         return new ServiceResponse<BaseMessageResponse>(
-                new BaseMessageResponse("Saved Successfully"+employeeDto1, HttpStatus.OK, true));
+                new BaseMessageResponse("Saved Successfully  " + employeeService.saveEmployee(employeeDto).toString(),
+                                        HttpStatus.OK, true));
+
+    }
+
+    @PostMapping(value = "/{id}")
+    public ServiceResponse<?> postEmployeeToDepartment(@PathVariable Long id,
+                                                       @Valid @RequestBody EmployeeDto employeeDto)
+            throws NotFoundException {
+        log.info(
+                "EmployeeController : postEmployeeToDepartment : Received Request to post Employee To Department" +
+                employeeDto.toString());
+        return new ServiceResponse<BaseMessageResponse>(
+                new BaseMessageResponse(
+                        "Saved Successfully  " + employeeService.postEmployeeToDepartment(id, employeeDto).toString(),
+                        HttpStatus.OK, true));
 
     }
 
     @GetMapping(value = "/{id}")
-    public ServiceResponse<?> retrieveEmployee(@PathVariable Long id) throws NotFoundException {
-        log.info("EmployeeController : Get Employee Details : Received Request to get Employee", id);
+    public ServiceResponse<?> getEmployeeDetails(@PathVariable Long id) throws NotFoundException {
+        log.info("EmployeeController : getEmployeeDetails  : Received Request to get Employee Details", id);
         return new ServiceResponse<>(
                 employeeService.getEmployee(id), HttpStatus.OK);
 
     }
 
-    /*@DeleteMapping("/{id}")
-    public ServiceResponse<?> deleteDepartment(@PathVariable long id) throws NotFoundException {
-
-        EmployeeService.deleteEmployee(id);
-        return new ServiceResponse<BaseMessageResponse>(
-                new BaseMessageResponse("Deleted Successfully", HttpStatus.OK, true));
-
-    }*/
-
+    @Validated
     @PutMapping("/{id}")
-    public ServiceResponse<?> updateEmployee(@RequestBody EmployeeDto employeeDto, @PathVariable long id)
+    public ServiceResponse<?> putEmployeeDetails(@RequestBody EmployeeDto employeeDto, @PathVariable Long id)
             throws NotFoundException {
-        log.info("EmployeeController : Put Employee Details : Received Request to put Employee", id);
-        employeeService.updateEmployee(employeeDto, id);
-        return  new ServiceResponse<BaseMessageResponse>(
-                new BaseMessageResponse("Saved Successfully", HttpStatus.OK, true));
-
+        log.info("EmployeeController : putEmployeeDetails : Received Request to put Employee Details", id);
+        return new ServiceResponse<BaseMessageResponse>(
+                new BaseMessageResponse(
+                        "Updated Successfully " + employeeService.updateEmployee(employeeDto, id).toString(),
+                        HttpStatus.OK, true));
     }
-
-
 
 }

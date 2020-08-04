@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.validation.constraints.NotEmpty;
 import java.time.LocalDate;
 
 @Data
@@ -14,6 +15,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 public class SalaryDto {
 
+    @NotEmpty
     @JsonProperty("amount")
     private Integer amount;
 
@@ -28,6 +30,8 @@ public class SalaryDto {
 
     @JsonProperty("is_current")
     private Boolean isCurrent;
+
+    private Long id;
 
 
 }
