@@ -18,14 +18,12 @@ public class DepartmentDto {
 
     @NotBlank(message = "Please provide a name for department")
     @JsonProperty("name")
-    private String name;  //Tech, SCM, HRM, Sales, Finance
+    private String name;
 
     @NotBlank(message = "Please provide a description for department")
     @JsonProperty("address")
     private String address;
 
-    @JsonProperty("managerId")//doubt for id relation with employee table
-    private Long managerId;
 
     @JsonProperty("is_active")
     private Boolean isActive;

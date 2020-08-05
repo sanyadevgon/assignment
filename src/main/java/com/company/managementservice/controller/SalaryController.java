@@ -59,7 +59,7 @@ public class SalaryController {
         log.info("SalaryController : putSalaryDetails : Received Request to put Salary Details", id);
         return new ServiceResponse<BaseMessageResponse>(
                 new BaseMessageResponse(
-                        "Updated Successfully " + salaryService.saveOrUpdateSalary(salaryDto, id).toString(),
+                        "Updated Successfully " + salaryService.UpdateSalary(salaryDto, id).toString(),
                         HttpStatus.OK, true));
     }
 

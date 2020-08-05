@@ -9,7 +9,7 @@ import javax.persistence.*;
 import java.util.Set;
 
 @Entity
-@Table(name = "department")
+@Table(name = "department",uniqueConstraints = {@UniqueConstraint(columnNames={"name","address"})})
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
@@ -21,9 +21,6 @@ public class Department extends AbstractEntity<Long> {
 
     @Column(name = "address")
     private String address;
-
-    @Column(name = "manager_id")//doubt for id relation with employee table
-    private Long managerId;
 
     @Column(name="is_active")
     private Boolean isActive;

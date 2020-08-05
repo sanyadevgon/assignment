@@ -29,11 +29,12 @@ public class EmployeeDto {
     @JsonProperty("address")
     private String address;
 
-    @Pattern(regexp = "^$|[0-9]{10}")
+    //@Pattern(regexp = "^$|[0-9]{10}")
+    @Pattern(regexp = "^[1-9][0-9]*${10}")
     @JsonProperty("phone")
     private String phone;
 
-    
+
     @Min(value = 18)
     @JsonProperty("age")
     private Integer age;

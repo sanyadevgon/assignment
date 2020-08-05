@@ -2,7 +2,6 @@ package com.company.managementservice.service;
 
 import com.company.managementservice.exception.NotFoundException;
 import com.company.managementservice.model.dto.EmployeeDto;
-import com.company.managementservice.model.dto.SalaryDto;
 import com.company.managementservice.model.entity.Department;
 import com.company.managementservice.model.entity.Employee;
 import com.company.managementservice.model.entity.Salary;
@@ -16,10 +15,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -110,8 +107,7 @@ EmployeeService {
         employee.get().setTerminatedDate(LocalDate.now());
         Set<Salary> salaries=employee.get().getSalaries();
         for(Salary s :salaries){
-            if(s.getIsCurrent()==true) {
-                s.setIsCurrent(false);
+            if(s.getToDate()==null) {
                 s.setToDate(LocalDate.now());
             }
         }

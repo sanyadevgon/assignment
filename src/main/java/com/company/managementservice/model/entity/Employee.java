@@ -12,8 +12,8 @@ import java.time.LocalDate;
 import java.util.Set;
 
 @Entity
+@Table(name="employee", uniqueConstraints = {@UniqueConstraint(columnNames={"first_name","phone"})})
 @Data
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class Employee extends AbstractEntity<Long> implements Serializable {
@@ -29,8 +29,6 @@ public class Employee extends AbstractEntity<Long> implements Serializable {
 
     @Column(name = "address")
     private String address;
-
-    //designation ENUMS,  status ENUM*
 
     @Column(name = "phone")
     private String phone;
@@ -49,12 +47,6 @@ public class Employee extends AbstractEntity<Long> implements Serializable {
 
     @Column(name = "terminated_date")//if status is active else terminated
     private LocalDate terminatedDate;
-//mappingContext'; nested exception is org.springframework.beans.factory.BeanCreationException:
-// Error creating bean with name 'jpaMappingContext': Invocation of init method failed;
-// nested exception is javax.persistence.PersistenceException: [PersistenceUnit: default]
-// Unable to build Hibernate SessionFactory; nested exception is org.hibernate.MappingException: Could
-    @Column(name = "manager_id")
-    private long managerId;
 
 
     @JoinColumn(name="employee_id", referencedColumnName ="id")

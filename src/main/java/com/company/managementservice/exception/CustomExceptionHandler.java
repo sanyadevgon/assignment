@@ -3,6 +3,7 @@ package com.company.managementservice.exception;
 import com.company.managementservice.model.response.BaseMessageResponse;
 import com.company.managementservice.model.response.ServiceResponse;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -35,8 +36,8 @@ public class CustomExceptionHandler {
                 HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(value = ConstraintViolationException.class)
-    public ServiceResponse<?> ConstraintViolationException(ConstraintViolationException ex) {
+    @ExceptionHandler(value = DataIntegrityViolationException.class)
+    public ServiceResponse<?> DataIntegrityViolationException(DataIntegrityViolationException ex) {
         log.info("Unable to complete request. Exception occurred: {}", ex.getMessage());
         return new ServiceResponse<BaseMessageResponse>(
                 new BaseMessageResponse<>(ex.getMessage(), HttpStatus.BAD_REQUEST, false),

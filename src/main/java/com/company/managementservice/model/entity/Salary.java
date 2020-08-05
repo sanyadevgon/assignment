@@ -28,8 +28,4 @@ public class Salary extends AbstractEntity<Long>{
     @Column(name = "to_date")
     private LocalDate toDate;
 
-    @Column(name = "is_current")
-    private Boolean isCurrent;
-
-
 }
