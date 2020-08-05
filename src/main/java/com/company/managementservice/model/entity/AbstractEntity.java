@@ -1,8 +1,10 @@
 package com.company.managementservice.model.entity;
 
+import com.company.managementservice.constant.Constants;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -18,6 +20,7 @@ public abstract class AbstractEntity<T> {
     @Column(name = "id")
     private T id;
 
+
     private LocalDateTime createdAt;
 
     private LocalDateTime updatedAt;
@@ -28,14 +31,14 @@ public abstract class AbstractEntity<T> {
 
     @PrePersist
     protected void onCreate() {
-        this.createdBy="admin";
+        this.createdBy=Constants.ADMIN;
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
     }
 
     @PreUpdate
     protected void onUpdate() {
-        this.updatedBy="admin";
+        this.updatedBy=Constants.ADMIN;
         this.updatedAt = LocalDateTime.now();
     }
 

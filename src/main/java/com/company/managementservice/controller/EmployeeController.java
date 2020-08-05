@@ -24,12 +24,12 @@ public class EmployeeController {
     private EmployeeService employeeService;
 
     @PostMapping
-    public ServiceResponse<?> postEmployeeDetails(@Valid @RequestBody EmployeeDto employeeDto) {
+    public ServiceResponse<?> saveEmployeeDetails(@Valid @RequestBody EmployeeDto employeeDto) {
         log.info(
                 "EmployeeController : postEmployeeDetails : Received Request to post Employee Details" +
                 employeeDto.toString());
         return new ServiceResponse<BaseMessageResponse>(
-                new BaseMessageResponse("Saved Successfully  " + employeeService.saveEmployee(employeeDto).toString(),
+                new BaseMessageResponse("Saved Successfully  " + employeeService.saveEmployee(employeeDto),
                                         HttpStatus.OK, true));
 
     }
@@ -39,7 +39,7 @@ public class EmployeeController {
     )
             throws NotFoundException {
         log.info(
-                "EmployeeController : assignEmployeeToDepartment : Received Request to assign Department To Employee:{id} :{id}"
+                "EmployeeController : assignEmployeeToDepartment : Received Request to assign Department To Employee:{} :{}"
                 , departmentId, employeeId);
         employeeService.putEmployeeToDepartment(departmentId,employeeId);
         return new ServiceResponse<BaseMessageResponse>(
@@ -53,7 +53,7 @@ public class EmployeeController {
     )
             throws NotFoundException {
         log.info(
-                "EmployeeController : removeFromdepartment : Received Request to assign Department To Employee:{id} :{id}"
+                "EmployeeController : removeFromDepartment : Received Request to assign Department To Employee:{} :{}"
                 , departmentId, employeeId);
         employeeService.removeEmployeeFromDepartment(departmentId,employeeId);
         return new ServiceResponse<BaseMessageResponse>(
@@ -63,7 +63,7 @@ public class EmployeeController {
 
     }
     @GetMapping(value = "/{id}")
-    public ServiceResponse<?> getEmployeeDetails(@PathVariable Long id) throws NotFoundException {
+    public ServiceResponse<?> getEmployeeDetails(@NonNull @PathVariable Long id) throws NotFoundException {
         log.info("EmployeeController : getEmployeeDetails  : Received Request to get Employee Details :{}", id);
         return new ServiceResponse<>(
                 employeeService.getEmployee(id), HttpStatus.OK);
@@ -71,12 +71,12 @@ public class EmployeeController {
     }
 
     @PutMapping("/{id}")
-    public ServiceResponse<?> putEmployeeDetails(@Valid @RequestBody EmployeeDto employeeDto, @PathVariable Long id)
+    public ServiceResponse<?> updateEmployeeDetails(@Valid @RequestBody EmployeeDto employeeDto,@NonNull @PathVariable Long id)
             throws NotFoundException {
         log.info("EmployeeController : putEmployeeDetails : Received Request to put Employee Details :{}", id);
         return new ServiceResponse<BaseMessageResponse>(
                 new BaseMessageResponse(
-                        "Updated Successfully " + employeeService.updateEmployee(employeeDto, id).toString(),
+                        "Updated Successfully " + employeeService.updateEmployee(employeeDto, id),
                         HttpStatus.OK, true));
     }
 

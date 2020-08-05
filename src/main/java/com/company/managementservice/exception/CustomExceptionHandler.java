@@ -21,7 +21,7 @@ public class CustomExceptionHandler {
     }
 
     @ExceptionHandler(value = DublicateDataException.class)
-    public ServiceResponse<?> badRequestException(DublicateDataException ex) {
+    public ServiceResponse<?> dublicateDataException(DublicateDataException ex) {
         log.info("Unable to complete request. Exception occurred: {}", ex.getMessage());
         return new ServiceResponse<BaseMessageResponse>(
                 new BaseMessageResponse<>(ex.getMessage(), HttpStatus.BAD_REQUEST, false),

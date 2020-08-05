@@ -28,48 +28,48 @@ public class OrganisationController {
     public ResponseEntity<?> saveOrganisationDetails(
             @Valid @RequestBody OrganisationDto organisationDto) throws EmptyBodyException {
         log.info(
-                "OrganisationController : saveOrganisationDetails : Received Request to save Organisation Details" +
+                "OrganisationController : saveOrganisationDetails : Received Request to save Organisation Details " +
                 organisationDto);
         return new ServiceResponse<BaseMessageResponse>(
                 new BaseMessageResponse(
-                        "Saved Successfully " + organisationService.saveOrganisation(organisationDto).toString(),
+                        "Saved Successfully " + organisationService.saveOrganisation(organisationDto),
                         HttpStatus.OK, true));
 
     }
 
     @GetMapping(value = "/{id}")
     public ResponseEntity<?> getOrganisation(@PathVariable @NonNull Integer id) throws NotFoundException {
-        log.info("OrganisationController : getOrganisationDetails : Received Request to get Organisation Details", id);
+        log.info("OrganisationController : getOrganisationDetails : Received Request to get Organisation Details ", id);
         return new ServiceResponse<>(
                 organisationService.getOrganisation(id), HttpStatus.OK);
 
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> putOrganisation(@Valid @RequestBody OrganisationDto organisationDto,
+    public ResponseEntity<?> updateOrganisation(@Valid @RequestBody OrganisationDto organisationDto,
                                              @NonNull @PathVariable Integer id) throws NotFoundException {
-        log.info("OrganisationController : PutOrganisationDetails : Received Request to put Organisation Details", id);
+        log.info("OrganisationController : PutOrganisationDetails : Received Request to put Organisation Details ", id);
         return new ServiceResponse<BaseMessageResponse>(
                 new BaseMessageResponse(
                         "Updated Successfully " +
-                        organisationService.updateOrganisation(organisationDto, id).toString(),
+                        organisationService.updateOrganisation(organisationDto, id),
                         HttpStatus.OK, true));
     }
 
-    @PutMapping("/{id}/removedepartment/{did}")
-    public ResponseEntity<?> removedepartment( @NonNull @PathVariable Integer id,
-                                              @NonNull @PathVariable Long did) throws NotFoundException {
-        log.info("OrganisationController : removedepartment : Received remove to Department from organisation", id);
+    @PutMapping("/{organisationId}/removedepartment/{departmentId}")
+    public ResponseEntity<?> removedepartment( @NonNull @PathVariable Integer organisationId,
+                                              @NonNull @PathVariable Long departmentId) throws NotFoundException {
+        log.info("OrganisationController : removedepartment : Received request to remove Department from organisation ", organisationId);
+        organisationService.removeDepartment(organisationId, departmentId);
         return new ServiceResponse<BaseMessageResponse>(
                 new BaseMessageResponse(
-                        "Updated Successfully " +
-                        organisationService.removeDepartment(id, did),
+                        "Updated Successfully " ,
                         HttpStatus.OK, true));
     }
 
-    @PutMapping("/{id}/removeorganisation")
+    @PutMapping("/{id}/remove-organisation")
     public ResponseEntity<?> removeorganisation(@NonNull @PathVariable Integer id) throws NotFoundException {
-        log.info("OrganisationController : removeOrganisationDetails : Received Request to remove Organisation Details", id);
+        log.info("OrganisationController : removeOrganisationDetails : Received Request to remove Organisation Details ", id);
         organisationService.removeOrganisation(id);
         return new ServiceResponse<BaseMessageResponse>(
                 new BaseMessageResponse(

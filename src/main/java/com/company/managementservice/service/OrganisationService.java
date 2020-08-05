@@ -57,7 +57,7 @@ public class OrganisationService {
 
     }
 
-    public int removeDepartment(Integer organisationId, Long departmentId) throws NotFoundException {
+    public void removeDepartment(Integer organisationId, Long departmentId) throws NotFoundException {
         Optional<Organisation> organisation = repo.findById(organisationId);
         if (!organisation.isPresent())
             throw new NotFoundException("NOT FOUND id organisation-" + organisationId);
@@ -72,7 +72,6 @@ public class OrganisationService {
                 break;
             }
         }
-        return 1;
 
     }
 

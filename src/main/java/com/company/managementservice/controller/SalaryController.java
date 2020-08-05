@@ -25,13 +25,13 @@ public class SalaryController {
     private SalaryService salaryService;
 
     @PostMapping(value="/{id}")
-    public ServiceResponse<?> postSalaryDetails(@Valid @PathVariable Long id,@Valid @RequestBody SalaryDto salaryDto)
+    public ServiceResponse<?> saveSalaryDetails(@NonNull @PathVariable Long id,@Valid @RequestBody SalaryDto salaryDto)
             throws NotFoundException {
         log.info(
-                "SalaryController : postSalaryDetails : Received Request to post Salary Details" +
+                "SalaryController : postSalaryDetails : Received Request to post Salary Details " +
                 salaryDto.toString());
         return new ServiceResponse<BaseMessageResponse>(
-                new BaseMessageResponse("Saved Successfully  " + salaryService.saveSalary(id,salaryDto).toString(),
+                new BaseMessageResponse("Saved Successfully  " + salaryService.saveSalary(id,salaryDto),
                                         HttpStatus.OK, true));
 
     }
@@ -44,19 +44,12 @@ public class SalaryController {
 
     }
 
-    /*@GetMapping(value = "/{id}")
-    public ServiceResponse<?> getSalaryDetails(@PathVariable Long id) throws NotFoundException {
-        log.info("SalaryDController : getSalaryDetails  : Received Request to get SalaryD Details", id);
-        return new ServiceResponse<>(
-                salaryService.getSalary(id), HttpStatus.OK);
-
-    }*/
 
 
     @PutMapping("/{id}")
-    public ServiceResponse<?> putEmployeeDetails(@RequestBody SalaryDto salaryDto, @PathVariable Long id)
+    public ServiceResponse<?> updateEmployeeDetails(@Valid @RequestBody SalaryDto salaryDto, @NonNull @PathVariable Long id)
             throws NotFoundException {
-        log.info("SalaryController : putSalaryDetails : Received Request to put Salary Details", id);
+        log.info("SalaryController : putSalaryDetails : Received Request to put Salary Details   :{}", id);
         return new ServiceResponse<BaseMessageResponse>(
                 new BaseMessageResponse(
                         "Updated Successfully " + salaryService.UpdateSalary(salaryDto, id).toString(),

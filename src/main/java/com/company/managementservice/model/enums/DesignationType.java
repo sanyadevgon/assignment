@@ -5,6 +5,7 @@ public enum DesignationType {
         CEO,
         SENIOR_MANAGER,
         SDE1,
-        SDE2
+        SDE2,
+        ADMIN
 
 }

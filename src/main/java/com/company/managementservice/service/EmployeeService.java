@@ -66,9 +66,9 @@ EmployeeService {
             throw new NotFoundException("NOT FOUND employee id-" + employeeId);
 
         Set<Employee> employees = department.get().getEmployees();
-        for(Employee e : employees){
-            if(e.getId()==employeeId)
-                department.get().getEmployees().remove(e);
+        for(Employee employee1 : employees){
+            if(employee1.getId()==employeeId)
+                department.get().getEmployees().remove(employee1);
 
         }
 
@@ -92,6 +92,7 @@ EmployeeService {
         employeeInfo.setCreatedAt(employee.get().getCreatedAt());
         employeeInfo.setCreatedBy(employee.get().getCreatedBy());
         employeeInfo.setHireDate(employee.get().getHireDate());
+        employeeInfo.setSalaries(employee.get().getSalaries());
         employeeRepo.save(employeeInfo);
         return modelMapper.map(employeeInfo, EmployeeDto.class);
 
@@ -106,9 +107,9 @@ EmployeeService {
         employee.get().setUpdatedBy("admin");
         employee.get().setTerminatedDate(LocalDate.now());
         Set<Salary> salaries=employee.get().getSalaries();
-        for(Salary s :salaries){
-            if(s.getToDate()==null) {
-                s.setToDate(LocalDate.now());
+        for(Salary salary :salaries){
+            if(salary.getToDate()==null) {
+                salary.setToDate(LocalDate.now());
             }
         }
     }
