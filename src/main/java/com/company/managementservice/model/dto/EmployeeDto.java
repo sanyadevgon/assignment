@@ -33,11 +33,11 @@ public class EmployeeDto {
     @JsonProperty("phone")
     private String phone;
 
+    
     @Min(value = 18)
     @JsonProperty("age")
     private Integer age;
 
-    @NotBlank(message = "Please provide a designation of employee")
     @JsonProperty("designation")
     private DesignationType designationType;
 

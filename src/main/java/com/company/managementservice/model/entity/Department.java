@@ -16,8 +16,8 @@ import java.util.Set;
 @EqualsAndHashCode
 public class Department extends AbstractEntity<Long> {
 
-    @Column(name = "description")
-    private String description;
+    @Column(name = "name")
+    private String name;
 
     @Column(name = "address")
     private String address;
@@ -31,5 +31,7 @@ public class Department extends AbstractEntity<Long> {
     @OneToMany(fetch = FetchType.LAZY)
     @JoinColumn(name = "department_id", referencedColumnName = "id")
     private Set<Employee> employees;
+
+
 
 }

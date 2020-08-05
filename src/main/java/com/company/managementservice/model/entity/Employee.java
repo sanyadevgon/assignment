@@ -47,7 +47,7 @@ public class Employee extends AbstractEntity<Long> implements Serializable {
     @Column(name = "hire_date")
     private LocalDate hireDate=LocalDate.now();
 
-    @Column(name = "terminated_date")//if status is active else teminated
+    @Column(name = "terminated_date")//if status is active else terminated
     private LocalDate terminatedDate;
 //mappingContext'; nested exception is org.springframework.beans.factory.BeanCreationException:
 // Error creating bean with name 'jpaMappingContext': Invocation of init method failed;
@@ -56,7 +56,9 @@ public class Employee extends AbstractEntity<Long> implements Serializable {
     @Column(name = "manager_id")
     private long managerId;
 
-    @OneToMany(fetch = FetchType.EAGER)
+
+    @JoinColumn(name="employee_id", referencedColumnName ="id")
+    @OneToMany(fetch = FetchType.EAGER,orphanRemoval = true,cascade = CascadeType.PERSIST)
     private Set<Salary> salaries;
 
 }

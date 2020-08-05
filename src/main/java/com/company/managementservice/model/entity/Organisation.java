@@ -27,7 +27,7 @@ public class Organisation  extends AbstractEntity<Integer> {
     private String headOfficeLocation;
 
     @Column(name="ceo")
-    private String ceo;//doubt
+    private Long ceo;
 
     @Column(name="url")
     private String url;

@@ -5,10 +5,12 @@ import com.company.managementservice.model.dto.DepartmentDto;
 import com.company.managementservice.model.response.BaseMessageResponse;
 import com.company.managementservice.model.response.ServiceResponse;
 import com.company.managementservice.service.DepartmentService;
+import lombok.NonNull;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -28,22 +30,26 @@ public class DepartmentController {
                 departmentDto.toString());
         //DepartmentDto departmentDto1 = departmentService.saveDepartment(departmentDto);
         return new ServiceResponse<BaseMessageResponse>(
-                new BaseMessageResponse("Saved Successfully" + departmentService.saveDepartment(departmentDto).toString(), HttpStatus.OK, true));
+                new BaseMessageResponse(
+                        "Saved Successfully" + departmentService.saveDepartment(departmentDto).toString(),
+                        HttpStatus.OK, true));
 
     }
 
     @GetMapping(value = "/{id}")
     public ServiceResponse<?> getDepartmentDetails(@PathVariable Long id) throws NotFoundException {
-        log.info("DepartmentController : getDepartmentDetails : Received Request to get Department Details", id);
+        log.info("DepartmentController : getDepartmentDetails : Received Request to get Department Details: id{}", id);
         return new ServiceResponse<>(
                 departmentService.getDepartment(id), HttpStatus.OK);
 
     }
 
     @PutMapping("/{id}")
-    public ServiceResponse<?> putDepartmentDetails(@Valid @RequestBody DepartmentDto departmentDto, @PathVariable long id)
+    public ServiceResponse<?> putDepartmentDetails(@Valid @RequestBody DepartmentDto departmentDto,
+                                                   @PathVariable long id)
             throws NotFoundException {
-        log.info("DepartmentController : putDepartmentDetails : Received Request to put Department Details ", id);
+        log.info("DepartmentController : putDepartmentDetails : Received Request to put Department Details for id:{}",
+                 id);
         return new ServiceResponse<BaseMessageResponse>(
                 new BaseMessageResponse(
                         "Updated Successfully " + departmentService.updateDepartment(departmentDto, id).toString(),
@@ -51,16 +57,43 @@ public class DepartmentController {
     }
 
     @PostMapping("/{id}")
-    public ServiceResponse<?> postDepartmentInCompany(@Valid @RequestBody DepartmentDto departmentDto, @PathVariable Integer id)
+    public ServiceResponse<?> postDepartmentInCompany(@Valid @RequestBody DepartmentDto departmentDto,
+                                                      @PathVariable Integer id)
             throws NotFoundException {
-        log.info("DepartmentController : postDepartmentInCompany : Received Request to post Department In Company ", id);
+        log.info(
+                "DepartmentController : postDepartmentInCompany : Received Request to post Department In Company for id:{} ",
+                id);
         //departmentService.postDepartmentInCompany(departmentDto, id);
         return new ServiceResponse<BaseMessageResponse>(
-                new BaseMessageResponse("Saved Successfully" +  departmentService.postDepartmentInCompany(departmentDto, id).toString(), HttpStatus.OK, true));
+                new BaseMessageResponse(
+                        "Saved Successfully" + departmentService.postDepartmentInCompany(departmentDto, id).toString(),
+                        HttpStatus.OK, true));
 
     }
 
+    @PutMapping(value = "/{companyId}/{departmentId}")
+    public ServiceResponse<?> assignDepartmentToCompany(@NonNull @PathVariable Integer companyId, @NonNull @PathVariable Long departmentId
+    )
+            throws NotFoundException {
+        log.info(
+                "DepartmentController : assignDepartmentToCompany : Received Request to assign Department To Company:{id} :{id}"
+                , companyId, departmentId);
+        departmentService.putDepartmentToOrganisation(companyId,departmentId);
+        return new ServiceResponse<BaseMessageResponse>(
+                new BaseMessageResponse(
+                        "Saved Successfully  ",
+                        HttpStatus.OK, true));
 
+    }
 
+    @PutMapping("/{id}/removedepartment")
+    public ResponseEntity<?> removeADepartment(@NonNull @PathVariable Long id) throws NotFoundException {
+        log.info("OrganisationController : removeDepartmentDetails : Received Request to remove Department Details", id);
+        departmentService.removeDepartment(id);
+        return new ServiceResponse<BaseMessageResponse>(
+                new BaseMessageResponse(
+                        "Removed Successfully ",
+                        HttpStatus.OK, true));
+    }
 
 }

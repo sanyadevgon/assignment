@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.Set;
 
@@ -38,7 +39,9 @@ public class DepartmentService {
         Optional<Department> department = departmentRepo.findById(id);
         if (!department.isPresent())
             throw new NotFoundException("NOT FOUND department id-" + id);
-        return modelMapper.map(department.get(), DepartmentDto.class);
+        DepartmentDto departmentDto=modelMapper.map(department.get(), DepartmentDto.class);
+        departmentDto.setEmployees(department.get().getEmployees());
+        return departmentDto;
     }
 
     public DepartmentDto updateDepartment(DepartmentDto departmentDto, Long id) throws NotFoundException {
@@ -65,6 +68,31 @@ public class DepartmentService {
         organisation.get().setDepartment(departments);
         organisationRepo.save(organisation.get());
         return modelMapper.map(departmentDto, DepartmentDto.class);
+
+    }
+    public void putDepartmentToOrganisation(Integer companyId, Long departmentId) throws NotFoundException {
+        Optional<Department> department = departmentRepo.findById(departmentId);
+        Optional<Organisation> organisation = organisationRepo.findById(companyId);
+
+        if (!department.isPresent())
+            throw new NotFoundException("NOT FOUND department id-" + departmentId);
+        if (!organisation.isPresent())
+            throw new NotFoundException("NOT FOUND organisation id-" + companyId);
+
+        Set<Department> departments = organisation.get().getDepartment();
+        departments.add(department.get());
+        organisation.get().setDepartment(departments);
+        organisationRepo.save(organisation.get());
+
+    }
+
+    public void removeDepartment(Long departmentId) throws NotFoundException {
+        Optional<Department> department = departmentRepo.findById(departmentId);
+        if (!department.isPresent())
+            throw new NotFoundException("NOT FOUND id department-" + departmentId);
+        department.get().setIsActive(false);
+        department.get().setUpdatedAt(LocalDateTime.now());
+        department.get().setUpdatedBy("admin");
 
     }
 }

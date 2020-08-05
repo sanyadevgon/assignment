@@ -29,7 +29,7 @@ public class OrganisationDto {
     private String headOfficeLocation;
 
     @JsonProperty("ceo")
-    private String ceo;//doubt
+    private Long ceo;//doubt
 
     @JsonProperty("url")
     private String url;

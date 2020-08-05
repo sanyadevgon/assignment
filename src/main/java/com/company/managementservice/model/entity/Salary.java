@@ -11,20 +11,16 @@ import java.time.LocalDate;
 @Entity
 @Table(name = "salary")
 @Data
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class Salary extends AbstractEntity<Long>{
 
-    @JoinColumn(name = "employee_id", referencedColumnName = "id")
-    @ManyToOne
-    Employee employee;
 
     @Column(name = "amount")
     private Integer amount;
 
     @Column(name = "currency")
-    private String firstName;
+    private String currency;
 
     @Column(name = "from_date")
     private LocalDate fromDate;
@@ -34,5 +30,6 @@ public class Salary extends AbstractEntity<Long>{
 
     @Column(name = "is_current")
     private Boolean isCurrent;
+
 
 }

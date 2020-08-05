@@ -5,6 +5,7 @@ import com.company.managementservice.model.dto.EmployeeDto;
 import com.company.managementservice.model.response.BaseMessageResponse;
 import com.company.managementservice.model.response.ServiceResponse;
 import com.company.managementservice.service.EmployeeService;
+import lombok.NonNull;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -33,37 +34,62 @@ public class EmployeeController {
 
     }
 
-    @PostMapping(value = "/{id}")
-    public ServiceResponse<?> postEmployeeToDepartment(@PathVariable Long id,
-                                                       @Valid @RequestBody EmployeeDto employeeDto)
+    @PutMapping(value = "/{employeeId}/department/{departmentId}")
+    public ServiceResponse<?> assignEmployeeToDepartment(@NonNull @PathVariable Long departmentId, @NonNull @PathVariable Long employeeId
+    )
             throws NotFoundException {
         log.info(
-                "EmployeeController : postEmployeeToDepartment : Received Request to post Employee To Department" +
-                employeeDto.toString());
+                "EmployeeController : assignEmployeeToDepartment : Received Request to assign Department To Employee:{id} :{id}"
+                , departmentId, employeeId);
+        employeeService.putEmployeeToDepartment(departmentId,employeeId);
         return new ServiceResponse<BaseMessageResponse>(
                 new BaseMessageResponse(
-                        "Saved Successfully  " + employeeService.postEmployeeToDepartment(id, employeeDto).toString(),
+                        "Saved Successfully  ",
                         HttpStatus.OK, true));
 
     }
+    @PutMapping(value = "/{employeeId}/removeFromDepartment/{departmentId}")
+    public ServiceResponse<?> removeEmployeeFromDepartment(@NonNull @PathVariable Long departmentId, @NonNull @PathVariable Long employeeId
+    )
+            throws NotFoundException {
+        log.info(
+                "EmployeeController : removeFromdepartment : Received Request to assign Department To Employee:{id} :{id}"
+                , departmentId, employeeId);
+        employeeService.removeEmployeeFromDepartment(departmentId,employeeId);
+        return new ServiceResponse<BaseMessageResponse>(
+                new BaseMessageResponse(
+                        "Saved Successfully  ",
+                        HttpStatus.OK, true));
 
+    }
     @GetMapping(value = "/{id}")
     public ServiceResponse<?> getEmployeeDetails(@PathVariable Long id) throws NotFoundException {
-        log.info("EmployeeController : getEmployeeDetails  : Received Request to get Employee Details", id);
+        log.info("EmployeeController : getEmployeeDetails  : Received Request to get Employee Details :{}", id);
         return new ServiceResponse<>(
                 employeeService.getEmployee(id), HttpStatus.OK);
 
     }
 
-    @Validated
     @PutMapping("/{id}")
-    public ServiceResponse<?> putEmployeeDetails(@RequestBody EmployeeDto employeeDto, @PathVariable Long id)
+    public ServiceResponse<?> putEmployeeDetails(@Valid @RequestBody EmployeeDto employeeDto, @PathVariable Long id)
             throws NotFoundException {
-        log.info("EmployeeController : putEmployeeDetails : Received Request to put Employee Details", id);
+        log.info("EmployeeController : putEmployeeDetails : Received Request to put Employee Details :{}", id);
         return new ServiceResponse<BaseMessageResponse>(
                 new BaseMessageResponse(
                         "Updated Successfully " + employeeService.updateEmployee(employeeDto, id).toString(),
                         HttpStatus.OK, true));
     }
+
+    @PutMapping("/{id}/removeemployee")
+    public ServiceResponse<?> removeAEmployee(@NonNull @PathVariable Long id)
+            throws NotFoundException {
+        log.info("EmployeeController : removeAEmployee: Received Request to remove Employee  :{}", id);
+        employeeService.removeEmployee(id);
+        return new ServiceResponse<BaseMessageResponse>(
+                new BaseMessageResponse(
+                        "Removed Successfully " ,
+                        HttpStatus.OK, true));
+    }
+
 
 }
