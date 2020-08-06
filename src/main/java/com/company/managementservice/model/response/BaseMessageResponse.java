@@ -16,5 +16,4 @@ public class BaseMessageResponse<T>{
     private boolean status;
 
 
-
 }

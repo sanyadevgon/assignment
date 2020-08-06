@@ -12,7 +12,7 @@ import javax.sql.DataSource;
 public class ApplicationConfiguration {
 
     @Value("${spring.datasource.username}")
-    private String springUsername;
+    private String databaseUsername;
 
     @Value("${spring.datasource.password}")
     private String springPassword;
@@ -28,7 +28,7 @@ public class ApplicationConfiguration {
     public DataSource dataSource() {
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
         dataSource.setUrl(springURL);
-        dataSource.setUsername(springUsername);
+        dataSource.setUsername(databaseUsername);
         dataSource.setPassword(springPassword);
         dataSource.setDriverClassName(springDriver);
         return dataSource;

@@ -10,7 +10,6 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -34,7 +33,7 @@ public class EmployeeController {
 
     }
 
-    @PutMapping(value = "/{employeeId}/department/{departmentId}")
+    @PutMapping(value = "add/{employeeId}/department/{departmentId}")
     public ServiceResponse<?> assignEmployeeToDepartment(@NonNull @PathVariable Long departmentId, @NonNull @PathVariable Long employeeId
     )
             throws NotFoundException {
@@ -48,21 +47,21 @@ public class EmployeeController {
                         HttpStatus.OK, true));
 
     }
-    @PutMapping(value = "/{employeeId}/removeFromDepartment/{departmentId}")
+    @PutMapping(value = "remove/{employeeId}/department/{departmentId}")
     public ServiceResponse<?> removeEmployeeFromDepartment(@NonNull @PathVariable Long departmentId, @NonNull @PathVariable Long employeeId
     )
             throws NotFoundException {
         log.info(
-                "EmployeeController : removeFromDepartment : Received Request to assign Department To Employee:{} :{}"
-                , departmentId, employeeId);
+                "EmployeeController : removeFromDepartment : Received Request to remove Employee from Department :{} :{}"
+                , employeeId, departmentId);
         employeeService.removeEmployeeFromDepartment(departmentId,employeeId);
         return new ServiceResponse<BaseMessageResponse>(
                 new BaseMessageResponse(
-                        "Saved Successfully  ",
+                        "Removed Successfully  ",
                         HttpStatus.OK, true));
 
     }
-    @GetMapping(value = "/{id}")
+    @GetMapping(value = "/get/{id}")
     public ServiceResponse<?> getEmployeeDetails(@NonNull @PathVariable Long id) throws NotFoundException {
         log.info("EmployeeController : getEmployeeDetails  : Received Request to get Employee Details :{}", id);
         return new ServiceResponse<>(
@@ -70,7 +69,7 @@ public class EmployeeController {
 
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/update/{id}")
     public ServiceResponse<?> updateEmployeeDetails(@Valid @RequestBody EmployeeDto employeeDto,@NonNull @PathVariable Long id)
             throws NotFoundException {
         log.info("EmployeeController : putEmployeeDetails : Received Request to put Employee Details :{}", id);
@@ -80,7 +79,7 @@ public class EmployeeController {
                         HttpStatus.OK, true));
     }
 
-    @PutMapping("/{id}/removeemployee")
+    @PutMapping("/terminate/{id}")
     public ServiceResponse<?> removeAEmployee(@NonNull @PathVariable Long id)
             throws NotFoundException {
         log.info("EmployeeController : removeAEmployee: Received Request to remove Employee  :{}", id);

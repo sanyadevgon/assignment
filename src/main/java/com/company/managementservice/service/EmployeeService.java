@@ -1,5 +1,6 @@
 package com.company.managementservice.service;
 
+import com.company.managementservice.constant.Constants;
 import com.company.managementservice.exception.NotFoundException;
 import com.company.managementservice.model.dto.EmployeeDto;
 import com.company.managementservice.model.entity.Department;
@@ -51,6 +52,7 @@ EmployeeService {
             throw new NotFoundException("NOT FOUND employee id-" + employeeId);
 
         Set<Employee> employees = department.get().getEmployees();
+        employee.get().setUpdatedAt(LocalDateTime.now());
         employees.add(employee.get());
         department.get().setEmployees(employees);
         departmentRepo.save(department.get());
@@ -71,8 +73,6 @@ EmployeeService {
                 department.get().getEmployees().remove(employee1);
 
         }
-
-
     }
 
     public EmployeeDto getEmployee(Long id) throws NotFoundException {
@@ -104,7 +104,7 @@ EmployeeService {
             throw new NotFoundException("NOT FOUND employee id-" + employeeId);
         employee.get().setIsActive(false);
         employee.get().setUpdatedAt(LocalDateTime.now());
-        employee.get().setUpdatedBy("admin");
+        employee.get().setUpdatedBy(Constants.ADMIN);
         employee.get().setTerminatedDate(LocalDate.now());
         Set<Salary> salaries=employee.get().getSalaries();
         for(Salary salary :salaries){

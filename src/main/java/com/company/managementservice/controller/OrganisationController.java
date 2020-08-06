@@ -39,7 +39,7 @@ public class OrganisationController {
 
     @GetMapping(value = "/{id}")
     public ResponseEntity<?> getOrganisation(@PathVariable @NonNull Integer id) throws NotFoundException {
-        log.info("OrganisationController : getOrganisationDetails : Received Request to get Organisation Details ", id);
+        log.info("OrganisationController : getOrganisationDetails : Received Request to get Organisation Details :{}", id);
         return new ServiceResponse<>(
                 organisationService.getOrganisation(id), HttpStatus.OK);
 
@@ -48,7 +48,7 @@ public class OrganisationController {
     @PutMapping("/{id}")
     public ResponseEntity<?> updateOrganisation(@Valid @RequestBody OrganisationDto organisationDto,
                                              @NonNull @PathVariable Integer id) throws NotFoundException {
-        log.info("OrganisationController : PutOrganisationDetails : Received Request to put Organisation Details ", id);
+        log.info("OrganisationController : PutOrganisationDetails : Received Request to put Organisation Details :{}", id);
         return new ServiceResponse<BaseMessageResponse>(
                 new BaseMessageResponse(
                         "Updated Successfully " +
@@ -59,7 +59,7 @@ public class OrganisationController {
     @PutMapping("/{organisationId}/removedepartment/{departmentId}")
     public ResponseEntity<?> removedepartment( @NonNull @PathVariable Integer organisationId,
                                               @NonNull @PathVariable Long departmentId) throws NotFoundException {
-        log.info("OrganisationController : removedepartment : Received request to remove Department from organisation ", organisationId);
+        log.info("OrganisationController : removedepartment : Received request to remove Department from organisation :{} ", organisationId);
         organisationService.removeDepartment(organisationId, departmentId);
         return new ServiceResponse<BaseMessageResponse>(
                 new BaseMessageResponse(
@@ -69,7 +69,7 @@ public class OrganisationController {
 
     @PutMapping("/{id}/remove-organisation")
     public ResponseEntity<?> removeorganisation(@NonNull @PathVariable Integer id) throws NotFoundException {
-        log.info("OrganisationController : removeOrganisationDetails : Received Request to remove Organisation Details ", id);
+        log.info("OrganisationController : removeOrganisationDetails : Received Request to remove Organisation Details :{}", id);
         organisationService.removeOrganisation(id);
         return new ServiceResponse<BaseMessageResponse>(
                 new BaseMessageResponse(
