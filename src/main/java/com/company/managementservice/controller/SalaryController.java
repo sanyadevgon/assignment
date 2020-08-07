@@ -1,7 +1,5 @@
 package com.company.managementservice.controller;
 
-
-
 import com.company.managementservice.exception.NotFoundException;
 import com.company.managementservice.model.dto.SalaryDto;
 import com.company.managementservice.model.response.BaseMessageResponse;
@@ -12,26 +10,28 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
 @Log4j2
 @RestController
+@Validated
 @RequestMapping(value = "/salary", consumes = MediaType.APPLICATION_JSON_VALUE)
 public class SalaryController {
 
     @Autowired
     private SalaryService salaryService;
 
-    @PostMapping(value="/{id}")
-    public ServiceResponse<?> saveSalaryDetails(@NonNull @PathVariable Long id,@Valid @RequestBody SalaryDto salaryDto)
+    @PostMapping(value = "/{id}")//first salary post
+    public ServiceResponse<?> saveSalaryDetails(@NonNull @PathVariable Long id, @Valid @RequestBody SalaryDto salaryDto)
             throws NotFoundException {
         log.info(
                 "SalaryController : postSalaryDetails : Received Request to post Salary Details " +
                 salaryDto.toString());
         return new ServiceResponse<BaseMessageResponse>(
-                new BaseMessageResponse("Saved Successfully  " + salaryService.saveSalary(id,salaryDto),
+                new BaseMessageResponse("Saved Successfully /n " + salaryService.saveSalary(id, salaryDto),
                                         HttpStatus.OK, true));
 
     }
@@ -44,15 +44,14 @@ public class SalaryController {
 
     }
 
-
-
     @PutMapping("/{id}")
-    public ServiceResponse<?> updateEmployeeDetails(@Valid @RequestBody SalaryDto salaryDto, @NonNull @PathVariable Long id)
+    public ServiceResponse<?> updateEmployeeDetails(@Valid @RequestBody SalaryDto salaryDto,
+                                                    @NonNull @PathVariable Long id)
             throws NotFoundException {
         log.info("SalaryController : putSalaryDetails : Received Request to put Salary Details   :{}", id);
         return new ServiceResponse<BaseMessageResponse>(
                 new BaseMessageResponse(
-                        "Updated Successfully " + salaryService.UpdateSalary(salaryDto, id).toString(),
+                        "Updated Successfully /n" + salaryService.UpdateSalary(salaryDto, id).toString(),
                         HttpStatus.OK, true));
     }
 

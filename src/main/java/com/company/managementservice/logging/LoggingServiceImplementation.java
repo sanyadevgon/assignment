@@ -1,8 +1,6 @@
 package com.company.managementservice.logging;
 
-import lombok.extern.java.Log;
 import lombok.extern.log4j.Log4j2;
-import org.apache.logging.log4j.ThreadContext;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
@@ -50,7 +48,6 @@ public class LoggingServiceImplementation implements LoggingService {
         stringBuilder.append("responseBody=[").append(body).append("] ");
 
         log.info(stringBuilder.toString());
-
 
     }
 

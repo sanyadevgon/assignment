@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.Set;
@@ -30,7 +29,10 @@ public class OrganisationService {
 
     public OrganisationDto saveOrganisation(OrganisationDto organisationDto) {
 
-        Organisation organisation = repo.save(modelMapper.map(organisationDto, Organisation.class));
+        Organisation organisation = modelMapper.map(organisationDto, Organisation.class);
+        String organisationName = organisation.getName().toLowerCase();
+        organisation.setName(organisationName);
+        repo.save(organisation);
         organisationDto.setId(organisation.getId());
         return modelMapper.map(organisation, OrganisationDto.class);
 
@@ -80,6 +82,7 @@ public class OrganisationService {
         if (!organisation.isPresent())
             throw new NotFoundException("NOT FOUND id organisation-" + organisationId);
         organisation.get().setIsActive(false);
+        organisation.get().getDepartment().clear();
         organisation.get().setUpdatedAt(LocalDateTime.now());
         organisation.get().setUpdatedBy("admin");
 

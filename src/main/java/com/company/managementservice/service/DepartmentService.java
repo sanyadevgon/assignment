@@ -29,7 +29,10 @@ public class DepartmentService {
 
     public DepartmentDto saveDepartment(DepartmentDto departmentDto) {
 
-        Department department = departmentRepo.save(modelMapper.map(departmentDto, Department.class));
+        Department department = modelMapper.map(departmentDto, Department.class);
+        String departmentName = department.getName().toLowerCase();
+        department.setName(departmentName);
+        departmentRepo.save(department);
         departmentDto.setId(department.getId());
         return modelMapper.map(department, DepartmentDto.class);
     }
@@ -39,7 +42,7 @@ public class DepartmentService {
         Optional<Department> department = departmentRepo.findById(id);
         if (!department.isPresent())
             throw new NotFoundException("NOT FOUND department id-" + id);
-        DepartmentDto departmentDto=modelMapper.map(department.get(), DepartmentDto.class);
+        DepartmentDto departmentDto = modelMapper.map(department.get(), DepartmentDto.class);
         departmentDto.setEmployees(department.get().getEmployees());
         return departmentDto;
     }
@@ -70,6 +73,7 @@ public class DepartmentService {
         return modelMapper.map(departmentDto, DepartmentDto.class);
 
     }
+
     public void putDepartmentToOrganisation(Integer companyId, Long departmentId) throws NotFoundException {
         Optional<Department> department = departmentRepo.findById(departmentId);
         Optional<Organisation> organisation = organisationRepo.findById(companyId);

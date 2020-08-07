@@ -1,5 +1,6 @@
 package com.company.managementservice.controller;
 
+import com.company.managementservice.exception.MethodArgumentNotValidException;
 import com.company.managementservice.exception.NotFoundException;
 import com.company.managementservice.model.dto.DepartmentDto;
 import com.company.managementservice.model.response.BaseMessageResponse;
@@ -11,12 +12,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
 import javax.validation.Valid;
+import javax.validation.constraints.Min;
 
 @Log4j2
 @RestController()
+@Validated
 @RequestMapping(value = "/department", consumes = MediaType.APPLICATION_JSON_VALUE)
 public class DepartmentController {
 
@@ -24,14 +29,23 @@ public class DepartmentController {
     private DepartmentService departmentService;
 
     @PostMapping
-    public ServiceResponse<?> saveDepartmentDetails(@Valid @RequestBody DepartmentDto departmentDto) {
+    public ServiceResponse<?> saveDepartmentDetails(@Min(1) @RequestBody DepartmentDto departmentDto,
+                                                    BindingResult bindingResult)
+            throws MethodArgumentNotValidException {
         log.info(
                 "DepartmentController : saveDepartmentDetails : Received Request to save department Details" +
                 departmentDto.toString());
+        if (bindingResult.hasErrors()) {
+            String errMsg = "";
+            for (FieldError err: bindingResult.getFieldErrors()) {
+                errMsg += err.getField() + " is " + err.getCode();
+            }
+            throw new MethodArgumentNotValidException(errMsg);
+        }
 
         return new ServiceResponse<BaseMessageResponse>(
                 new BaseMessageResponse(
-                        "Saved Successfully" + departmentService.saveDepartment(departmentDto),
+                        "Saved Successfully /n " + departmentService.saveDepartment(departmentDto),
                         HttpStatus.OK, true));
 
     }
@@ -46,10 +60,18 @@ public class DepartmentController {
 
     @PutMapping("/update/{id}")
     public ServiceResponse<?> updateDepartmentDetails(@Valid @RequestBody DepartmentDto departmentDto,
-                                                   @NonNull @PathVariable long id)
-            throws NotFoundException {
+                                                      BindingResult bindingResult,
+                                                      @NonNull @PathVariable long id)
+            throws NotFoundException, MethodArgumentNotValidException {
         log.info("DepartmentController : putDepartmentDetails : Received Request to put Department Details for id:{}",
                  id);
+        if (bindingResult.hasErrors()) {
+            String errMsg = "";
+            for (FieldError err: bindingResult.getFieldErrors()) {
+                errMsg += err.getField() + " is " + err.getCode();
+            }
+            throw new MethodArgumentNotValidException(errMsg);
+        }
         return new ServiceResponse<BaseMessageResponse>(
                 new BaseMessageResponse(
                         "Updated Successfully " + departmentService.updateDepartment(departmentDto, id).toString(),
@@ -58,11 +80,19 @@ public class DepartmentController {
 
     @PostMapping("/add/company/{id}")
     public ServiceResponse<?> saveDepartmentInCompany(@Valid @RequestBody DepartmentDto departmentDto,
+                                                      BindingResult bindingResult,
                                                       @NonNull @PathVariable Integer id)
-            throws NotFoundException {
+            throws NotFoundException, MethodArgumentNotValidException {
         log.info(
                 "DepartmentController : postDepartmentInCompany : Received Request to post Department In Company for id:{} ",
                 id);
+        if (bindingResult.hasErrors()) {
+            String errMsg = "";
+            for (FieldError err: bindingResult.getFieldErrors()) {
+                errMsg += err.getField() + " is " + err.getCode();
+            }
+            throw new MethodArgumentNotValidException(errMsg);
+        }
         return new ServiceResponse<BaseMessageResponse>(
                 new BaseMessageResponse(
                         "Saved Successfully" + departmentService.postDepartmentInCompany(departmentDto, id).toString(),
@@ -71,13 +101,14 @@ public class DepartmentController {
     }
 
     @PutMapping(value = "/put/company/{companyId}/{departmentId}")
-    public ServiceResponse<?> assignDepartmentToCompany(@NonNull @PathVariable Integer companyId, @NonNull @PathVariable Long departmentId
+    public ServiceResponse<?> assignDepartmentToCompany(@NonNull @PathVariable Integer companyId,
+                                                        @NonNull @PathVariable Long departmentId
     )
             throws NotFoundException {
         log.info(
                 "DepartmentController : assignDepartmentToCompany : Received Request to assign Department To Company:{} :{}"
                 , companyId, departmentId);
-        departmentService.putDepartmentToOrganisation(companyId,departmentId);
+        departmentService.putDepartmentToOrganisation(companyId, departmentId);
         return new ServiceResponse<BaseMessageResponse>(
                 new BaseMessageResponse(
                         "Saved Successfully  ",
@@ -87,7 +118,8 @@ public class DepartmentController {
 
     @DeleteMapping("/remove/{id}")
     public ResponseEntity<?> removeADepartment(@NonNull @PathVariable Long id) throws NotFoundException {
-        log.info("OrganisationController : removeDepartmentDetails : Received Request to remove Department Details :{}", id);
+        log.info("OrganisationController : removeDepartmentDetails : Received Request to remove Department Details :{}",
+                 id);
         departmentService.removeDepartment(id);
         return new ServiceResponse<BaseMessageResponse>(
                 new BaseMessageResponse(

@@ -2,11 +2,12 @@ package com.company.managementservice.model.dto;
 
 import com.company.managementservice.model.entity.Department;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.sun.istack.NotNull;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Size;
 import java.util.Set;
 
 @Data
@@ -28,7 +29,7 @@ public class OrganisationDto {
     private String headOfficeLocation;
 
     @JsonProperty("ceo")
-    private Long ceo;//doubt
+    private Long ceo;
 
     @JsonProperty("url")
     private String url;

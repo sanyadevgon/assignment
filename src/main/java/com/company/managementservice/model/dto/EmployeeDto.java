@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
 import javax.validation.constraints.*;
 import java.time.LocalDate;
 
@@ -29,11 +30,10 @@ public class EmployeeDto {
     @JsonProperty("address")
     private String address;
 
-    //@Pattern(regexp = "^$|[0-9]{10}")
-    @Pattern(regexp = "^[1-9][0-9]*${10}")
+    @Size(min = 10, max = 10)
+    @Pattern(regexp = "^[1-9][0-9]*${9}")
     @JsonProperty("phone")
     private String phone;
-
 
     @Min(value = 18)
     @JsonProperty("age")

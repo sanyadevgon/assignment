@@ -1,6 +1,5 @@
 package com.company.managementservice.interceptor;
 
-
 import com.company.managementservice.logging.LoggingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.MethodParameter;
@@ -26,14 +25,15 @@ public class CustomRequestBodyAdviceAdapter extends RequestBodyAdviceAdapter {
     HttpServletResponse httpServletResponse;
 
     @Override
-    public boolean supports(MethodParameter methodParameter, Type type, Class<? extends HttpMessageConverter<?>> aClass) {
+    public boolean supports(MethodParameter methodParameter, Type type,
+                            Class<? extends HttpMessageConverter<?>> aClass) {
         return true;
     }
 
     @Override
     public Object afterBodyRead(Object body, HttpInputMessage inputMessage, MethodParameter parameter, Type targetType,
                                 Class<? extends HttpMessageConverter<?>> converterType) {
-        loggingService.logRequest(httpServletRequest, httpServletResponse,body);
+        loggingService.logRequest(httpServletRequest, httpServletResponse, body);
 
         return super.afterBodyRead(body, inputMessage, parameter, targetType, converterType);
     }

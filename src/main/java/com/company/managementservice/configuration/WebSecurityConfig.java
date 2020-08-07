@@ -14,37 +14,36 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @Configuration
 @EnableWebSecurity
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
-    
+
     @Autowired
     private UserDetailsService customUserDetailsService;
-    
+
     @Autowired
-    private PasswordEncoder passwordEncoder;    
-        
+    private PasswordEncoder passwordEncoder;
+
     @Autowired
     public void configureGlobal(final AuthenticationManagerBuilder auth) throws Exception {
         auth
-            .userDetailsService(customUserDetailsService)
-            .passwordEncoder(passwordEncoder);
+                .userDetailsService(customUserDetailsService)
+                .passwordEncoder(passwordEncoder);
     }
 
     @Override
     public void configure(HttpSecurity http) throws Exception {
         http
-            .authorizeRequests()
+                .authorizeRequests()
                 .antMatchers("/oauth/token").permitAll()
                 .anyRequest().authenticated()
                 .and()
-            .httpBasic()
+                .httpBasic()
                 .and()
-            .csrf().disable();
+                .csrf().disable();
     }
-    
 
     @Bean
     @Override
     public AuthenticationManager authenticationManagerBean() throws Exception {
         return super.authenticationManagerBean();
-    }    
+    }
 
 }

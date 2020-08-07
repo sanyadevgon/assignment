@@ -1,8 +1,5 @@
 package com.company.managementservice.interceptor;
 
-
-
-
 import com.company.managementservice.logging.LoggingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.MethodParameter;
@@ -14,8 +11,6 @@ import org.springframework.http.server.ServletServerHttpRequest;
 import org.springframework.http.server.ServletServerHttpResponse;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
-
-
 
 @ControllerAdvice
 public class CustomResponseBodyAdviceAdapter implements ResponseBodyAdvice<Object> {
@@ -30,8 +25,10 @@ public class CustomResponseBodyAdviceAdapter implements ResponseBodyAdvice<Objec
 
     @Override
     public Object beforeBodyWrite(Object o, MethodParameter methodParameter, MediaType mediaType,
-                                  Class<? extends HttpMessageConverter<?>> aClass, ServerHttpRequest serverHttpRequest, ServerHttpResponse serverHttpResponse) {
-        if (serverHttpRequest instanceof ServletServerHttpRequest && serverHttpResponse instanceof ServletServerHttpResponse) {
+                                  Class<? extends HttpMessageConverter<?>> aClass, ServerHttpRequest serverHttpRequest,
+                                  ServerHttpResponse serverHttpResponse) {
+        if (serverHttpRequest instanceof ServletServerHttpRequest &&
+            serverHttpResponse instanceof ServletServerHttpResponse) {
             loggingService.logResponse(((ServletServerHttpRequest) serverHttpRequest).getServletRequest(),
                                        ((ServletServerHttpResponse) serverHttpResponse).getServletResponse(), o);
         }
