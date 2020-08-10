@@ -12,8 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 @Service
 @Transactional
@@ -54,6 +53,7 @@ public class OrganisationService {
         organisationInfo.setId(id);
         organisationInfo.setCreatedAt(organisation.get().getCreatedAt());
         organisationInfo.setCreatedBy(organisation.get().getCreatedBy());
+        organisationInfo.setIsActive(organisation.get().getIsActive());
         repo.save(organisationInfo);
         return modelMapper.map(organisationInfo, OrganisationDto.class);
 
@@ -86,6 +86,20 @@ public class OrganisationService {
         organisation.get().setUpdatedAt(LocalDateTime.now());
         organisation.get().setUpdatedBy("admin");
 
+    }
+    @Transactional
+    public Set<Map<String,Object>> getAllDepartments(Integer organisationId) throws NotFoundException {
+        Optional<Organisation> organisation = repo.findById(organisationId);
+        if (!organisation.isPresent())
+            throw new NotFoundException("NOT FOUND id organisation-" + organisationId);
+        Set<Map<String,Object>> departments = new HashSet<>();
+        for (Department department: organisation.get().getDepartment()){
+            HashMap<String,Object> names= new HashMap<>();
+            names.put("name",department.getName());
+            names.put("id",department.getId());
+            departments.add(names);
+        }
+        return departments;
     }
 
 }

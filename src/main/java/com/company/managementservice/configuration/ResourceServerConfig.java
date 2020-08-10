@@ -17,15 +17,17 @@ public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
                 .disable()
                 .and()
                 .authorizeRequests()
-                .antMatchers("/employee/get/{id}").hasAnyRole("SENIOR_MANAGER", "CEO", "SDE1", "SDE2")
-                .antMatchers("/employee/add/**").hasAnyRole("SENIOR_MANAGER", "CEO")
-                .antMatchers("/employee/remove/**").hasAnyRole("SENIOR_MANAGER", "CEO")
-                .antMatchers("/employee/terminate/**").hasAnyRole("SENIOR_MANAGER", "CEO")
-                .antMatchers("/employee/update/{id}").hasAnyRole("SENIOR_MANAGER", "CEO")
-                .antMatchers("/employee").hasAnyRole("SENIOR_MANAGER", "CEO")
-                .antMatchers("/salary/**").hasAnyRole("SENIOR_MANAGER", "CEO")
-                .antMatchers("/department/**").hasAnyRole("SENIOR_MANAGER", "CEO")
-                .antMatchers("/organisation/**").hasRole("CEO");
+                .antMatchers("/{employeeId}/details").hasAnyRole("ADMIN","SENIOR_MANAGER", "CEO", "SDE1", "SDE2")
+                .antMatchers("/{employeeId}/assign-department/{departmentId}/in-organisation/{organisationId}").hasAnyRole("ADMIN","SENIOR_MANAGER", "CEO")
+                .antMatchers("/{employeeId}/update-details").hasAnyRole("SENIOR_MANAGER", "CEO","ADMIN")
+                .antMatchers("/{employeeId}/terminate").hasAnyRole("ADMIN", "CEO")
+                .antMatchers("/{employeeId}/freelance/organisation/{organisationId}").hasAnyRole("ADMIN", "CEO")
+                .antMatchers("/{employeeId}/remove-from-department/{departmentId}").hasAnyRole("ADMIN", "CEO")
+                .antMatchers("/employee/**").hasAnyRole("ADMIN", "CEO")
+                .antMatchers("/salary/**").hasAnyRole("ADMIN", "CEO")
+                .antMatchers("/department/**").hasAnyRole("ADMIN", "CEO")
+                .antMatchers("/organisation/**").hasRole("ADMIN");
+
 
     }
 

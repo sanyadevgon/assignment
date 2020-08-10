@@ -18,7 +18,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import javax.validation.constraints.Min;
 
 @RestController
 @Log4j2
@@ -30,7 +29,7 @@ public class OrganisationController {
     private OrganisationService organisationService;
 
     @PostMapping
-    public ResponseEntity<?> saveOrganisationDetails(
+    public ResponseEntity<OrganisationDto> saveOrganisationDetails(
             @Valid @RequestBody OrganisationDto organisationDto, BindingResult bindingResult)
             throws MethodArgumentNotValidException {
         log.info(
@@ -44,29 +43,30 @@ public class OrganisationController {
             }
             throw new MethodArgumentNotValidException(errMsg);
         }
-        return new ServiceResponse<BaseMessageResponse>(
-                new BaseMessageResponse(
-                        "Saved Successfully " + organisationService.saveOrganisation(organisationDto),
+        return new ServiceResponse<>(
+                new BaseMessageResponse<>(
+                        organisationService.saveOrganisation(organisationDto),
                         HttpStatus.OK, true));
 
     }
 
-    @GetMapping(value = "/{id}")
-    public ResponseEntity<?> getOrganisation(@PathVariable @NonNull Integer id) throws NotFoundException {
+    @GetMapping(value = "/{organisationId}/details")
+    public ResponseEntity<?> getOrganisation(@PathVariable @NonNull Integer organisationId) throws NotFoundException {
         log.info("OrganisationController : getOrganisationDetails : Received Request to get Organisation Details :{}",
-                 id);
+                 organisationId);
         return new ServiceResponse<>(
-                organisationService.getOrganisation(id), HttpStatus.OK);
+                new BaseMessageResponse<>(
+                        organisationService.getOrganisation(organisationId), HttpStatus.OK, true));
 
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/{organisationId}/update-details")
     public ResponseEntity<?> updateOrganisation(@Valid @RequestBody OrganisationDto organisationDto,
                                                 BindingResult bindingResult,
-                                                @Min(0) @PathVariable Integer id)
+                                                @PathVariable Integer organisationId)
             throws NotFoundException, MethodArgumentNotValidException {
-        log.info("OrganisationController : PutOrganisationDetails : Received Request to put Organisation Details :{}",
-                 id);
+        log.info("OrganisationController : PutOrganisationDetails : Received Request to put Organisation Details  :{}",
+                 organisationId);
         if (bindingResult.hasErrors()) {
             String errMsg = "";
             for (FieldError err: bindingResult.getFieldErrors()) {
@@ -74,18 +74,16 @@ public class OrganisationController {
             }
             throw new MethodArgumentNotValidException(errMsg);
         }
-        return new ServiceResponse<BaseMessageResponse>(
-                new BaseMessageResponse(
-                        "Updated Successfully " +
-                        organisationService.updateOrganisation(organisationDto, id),
-                        HttpStatus.OK, true));
+        return new ServiceResponse<>(
+                new BaseMessageResponse<>(organisationService.updateOrganisation(organisationDto, organisationId),
+                                          HttpStatus.OK, true));
     }
 
     @DeleteMapping("/{organisationId}/remove-department/{departmentId}")
     public ResponseEntity<?> removedepartment(@NonNull @PathVariable Integer organisationId,
                                               @NonNull @PathVariable Long departmentId) throws NotFoundException {
         log.info(
-                "OrganisationController : removedepartment : Received request to remove Department from organisation :{} ",
+                "OrganisationController : removeDepartment : Received request to remove Department from organisation id :{} ",
                 organisationId);
         organisationService.removeDepartment(organisationId, departmentId);
         return new ServiceResponse<BaseMessageResponse>(
@@ -97,13 +95,22 @@ public class OrganisationController {
     @DeleteMapping("/{id}/remove-organisation")
     public ResponseEntity<?> removeorganisation(@NonNull @PathVariable Integer id) throws NotFoundException {
         log.info(
-                "OrganisationController : removeOrganisationDetails : Received Request to remove Organisation Details :{}",
+                "OrganisationController : removeOrganisationDetails : Received Request to remove Organisation Details id :{}",
                 id);
         organisationService.removeOrganisation(id);
         return new ServiceResponse<BaseMessageResponse>(
                 new BaseMessageResponse(
                         "Removed Successfully ",
                         HttpStatus.OK, true));
+    }
+
+    @GetMapping(value = "/{id}/all-departments")
+    public ServiceResponse<?> getDepartmentDetails(@NonNull @PathVariable Integer id) throws NotFoundException {
+        log.info("OrganisationController : getDepartmentDetails : Received Request to get Department  Details id:{}",
+                 id);
+        return new ServiceResponse<>(
+                new BaseMessageResponse(organisationService.getAllDepartments(id), HttpStatus.OK, true));
+
     }
 
 }

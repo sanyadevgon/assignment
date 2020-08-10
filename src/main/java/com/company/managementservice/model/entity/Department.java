@@ -25,8 +25,8 @@ public class Department extends AbstractEntity<Long> {
     @Column(name="is_active")
     private Boolean isActive;
 
-    @OneToMany(fetch = FetchType.LAZY)
-    @JoinColumn(name = "department_id", referencedColumnName = "id")
+    @OneToMany(fetch = FetchType.EAGER)
+    //@JoinColumn(name = "department_id", referencedColumnName = "id")
     private Set<Employee> employees;
 
 

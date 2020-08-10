@@ -2,6 +2,7 @@ package com.company.managementservice.controller;
 
 import com.company.managementservice.exception.MethodArgumentNotValidException;
 import com.company.managementservice.exception.NotFoundException;
+import com.company.managementservice.exception.RequestRejectedException;
 import com.company.managementservice.model.dto.EmployeeDto;
 import com.company.managementservice.model.response.BaseMessageResponse;
 import com.company.managementservice.model.response.ServiceResponse;
@@ -41,36 +42,59 @@ public class EmployeeController {
             }
             throw new MethodArgumentNotValidException(errMsg);
         }
-        return new ServiceResponse<BaseMessageResponse>(
-                new BaseMessageResponse("Saved Successfully /n  " + employeeService.saveEmployee(employeeDto),
+        return new ServiceResponse<>(
+                new BaseMessageResponse(employeeService.saveEmployee(employeeDto),
                                         HttpStatus.OK, true));
 
     }
 
-    @PutMapping(value = "add/{employeeId}/department/{departmentId}")
-    public ServiceResponse<?> assignEmployeeToDepartment(@NonNull @PathVariable Long departmentId,
-                                                         @NonNull @PathVariable Long employeeId
+    @PutMapping(value = "/{employeeId}/assign-department/{departmentId}/in-organisation/{organisationId}")
+    public ServiceResponse<?> assignEmployeeDepartment(@NonNull @PathVariable Long employeeId,
+                                                       @NonNull @PathVariable Long departmentId,
+                                                       @NonNull @PathVariable Integer organisationId
     )
-            throws NotFoundException {
+            throws NotFoundException, RequestRejectedException {
         log.info(
                 "EmployeeController : assignEmployeeToDepartment : Received Request to assign Department To Employee:{} :{}"
                 , departmentId, employeeId);
-        employeeService.putEmployeeToDepartment(departmentId, employeeId);
-        return new ServiceResponse<BaseMessageResponse>(
+        if (employeeId == null || departmentId == null || organisationId == null)
+            throw new RequestRejectedException("Provide valid id ");
+
+        return new ServiceResponse<>(
                 new BaseMessageResponse(
-                        "Saved Successfully  ",
+                        employeeService.putEmployeeToDepartment(employeeId, departmentId, organisationId),
                         HttpStatus.OK, true));
 
     }
 
-    @DeleteMapping(value = "remove/{employeeId}/department/{departmentId}")
+    @PutMapping(value = "/{employeeId}/freelance/organisation/{organisationId}")
+    public ServiceResponse<?> assignFreelancerEmployeeOrganisation(@NonNull @PathVariable Long employeeId,
+                                                                   @NonNull @PathVariable Integer organisationId
+    )
+            throws NotFoundException, RequestRejectedException {
+        log.info(
+                "EmployeeController : assignEmployeeToDepartment : Received Request to assign Department To Employee:{} :{}"
+                , employeeId, organisationId);
+        if (employeeId == null || organisationId == null)
+            throw new RequestRejectedException("Provide valid id ");
+
+        return new ServiceResponse<>(
+                new BaseMessageResponse(
+                        employeeService.putFreelancerEmployeeToOrganiation(employeeId, organisationId),
+                        HttpStatus.OK, true));
+
+    }
+
+    @DeleteMapping(value = "/{employeeId}/remove-from-department/{departmentId}")
     public ServiceResponse<?> removeEmployeeFromDepartment(@NonNull @PathVariable Long departmentId,
                                                            @NonNull @PathVariable Long employeeId
     )
-            throws NotFoundException {
+            throws NotFoundException, RequestRejectedException {
         log.info(
                 "EmployeeController : removeFromDepartment : Received Request to remove Employee from Department :{} :{}"
                 , employeeId, departmentId);
+        if (employeeId == null || departmentId == null)
+            throw new RequestRejectedException("Provide valid id ");
         employeeService.removeEmployeeFromDepartment(departmentId, employeeId);
         return new ServiceResponse<BaseMessageResponse>(
                 new BaseMessageResponse(
@@ -79,19 +103,25 @@ public class EmployeeController {
 
     }
 
-    @GetMapping(value = "/get/{id}")
-    public ServiceResponse<?> getEmployeeDetails(@NonNull @PathVariable Long id) throws NotFoundException {
-        log.info("EmployeeController : getEmployeeDetails  : Received Request to get Employee Details :{}", id);
+    @GetMapping(value = "/{employeeId}/details")
+    public ServiceResponse<?> getEmployeeDetails(@NonNull @PathVariable Long employeeId)
+            throws NotFoundException, RequestRejectedException {
+        log.info("EmployeeController : getEmployeeDetails  : Received Request to get Employee Details :{}", employeeId);
+        if (employeeId == null)
+            throw new RequestRejectedException("Provide valid id ");
         return new ServiceResponse<>(
-                employeeService.getEmployee(id), HttpStatus.OK);
+                new BaseMessageResponse(
+                        employeeService.getEmployee(employeeId), HttpStatus.OK, true));
 
     }
 
-    @PutMapping("/update/{id}")
+    @PutMapping("/{employeeId}/update-details")
     public ServiceResponse<?> updateEmployeeDetails(@Valid @RequestBody EmployeeDto employeeDto,
-                                                    BindingResult bindingResult, @NonNull @PathVariable Long id)
-            throws NotFoundException, MethodArgumentNotValidException {
-        log.info("EmployeeController : putEmployeeDetails : Received Request to put Employee Details :{}", id);
+                                                    BindingResult bindingResult, @NonNull @PathVariable Long employeeId)
+            throws NotFoundException, MethodArgumentNotValidException, RequestRejectedException {
+        log.info("EmployeeController : putEmployeeDetails : Received Request to put Employee Details :{}", employeeId);
+        if (employeeId == null)
+            throw new RequestRejectedException("Provide valid id ");
         if (bindingResult.hasErrors()) {
             String errMsg = "";
             for (FieldError err: bindingResult.getFieldErrors()) {
@@ -99,17 +129,19 @@ public class EmployeeController {
             }
             throw new MethodArgumentNotValidException(errMsg);
         }
-        return new ServiceResponse<BaseMessageResponse>(
-                new BaseMessageResponse(
-                        "Updated Successfully " + employeeService.updateEmployee(employeeDto, id),
+        return new ServiceResponse<>(
+                new BaseMessageResponse<>(
+                        employeeService.updateEmployee(employeeDto, employeeId),
                         HttpStatus.OK, true));
     }
 
-    @PutMapping("/terminate/{id}")
-    public ServiceResponse<?> removeAEmployee(@NonNull @PathVariable Long id)
-            throws NotFoundException {
-        log.info("EmployeeController : removeAEmployee: Received Request to remove Employee  :{}", id);
-        employeeService.removeEmployee(id);
+    @DeleteMapping("/{employeeId}/terminate")
+    public ServiceResponse<?> removeAEmployee(@NonNull @PathVariable Long employeeId)
+            throws NotFoundException, RequestRejectedException {
+        log.info("EmployeeController : removeAEmployee: Received Request to remove Employee  :{}", employeeId);
+        if (employeeId == null)
+            throw new RequestRejectedException("Provide valid id ");
+        employeeService.removeEmployee(employeeId);
         return new ServiceResponse<BaseMessageResponse>(
                 new BaseMessageResponse(
                         "Removed Successfully ",

@@ -33,8 +33,12 @@ public class SalaryService {
         Optional<Employee> employee = employeeRepo.findById(id);
         if (!employee.isPresent())
             throw new NotFoundException("NOT FOUND employee id-" + id);
+        if(employee.get().getTerminatedDate()!=null)
+            throw new NotFoundException("Employee is terminated, salary cant be updated");
         Salary salary = modelMapper.map(salaryDto, Salary.class);
         Set<Salary> salaries = employee.get().getSalaries();
+        if(!salaries.isEmpty())
+            throw new NotFoundException("Salary details already exists, try updating the salary details");
         salaries.add(salary);
         salaryRepo.save(salary);
         employee.get().setSalaries(salaries);
@@ -46,8 +50,7 @@ public class SalaryService {
 
         Optional<Employee> employee = employeeRepo.findById(id);
         if (!employee.isPresent())
-            throw new NotFoundException("NOT FOUND employee id-" + id);
-
+            throw new NotFoundException("NOT FOUND employee id- " + id);
         Set<Salary> salaries = employee.get().getSalaries();
         return salaries.stream().map(e -> modelMapper.map(e, SalaryDto.class)).collect(Collectors.toList());
 
@@ -56,8 +59,12 @@ public class SalaryService {
     public SalaryDto UpdateSalary(SalaryDto salaryDto, long id) throws NotFoundException {
         Optional<Employee> employee = employeeRepo.findById(id);
         if (!employee.isPresent())
-            throw new NotFoundException("NOT FOUND employee id-" + id);
+            throw new NotFoundException("NOT FOUND employee id- " + id);
         Set<Salary> salaries = employee.get().getSalaries();
+        if(salaries.isEmpty())
+            throw new NotFoundException("Salary details does not exists, first set the salary details");
+        if(employee.get().getTerminatedDate()!=null)
+            throw new NotFoundException("Employee is terminated, salary cant be updated");
         for (Salary s: salaries) {
             if (s.getToDate() == null) {
                 s.setToDate(LocalDate.now());
@@ -68,9 +75,28 @@ public class SalaryService {
         salaries.add(salary);
         employee.get().setSalaries(salaries);
         salaryRepo.save(salary);
-        Employee data = employeeRepo.save(employee.get());
-
+        employeeRepo.save(employee.get());
         return salaryDto;
+
+    }
+    public SalaryDto getEmployeeCurrentSalary(Long id) throws NotFoundException {
+
+        Optional<Employee> employee = employeeRepo.findById(id);
+        if (!employee.isPresent())
+            throw new NotFoundException("NOT FOUND employee id- " + id);
+        if(employee.get().getTerminatedDate()!=null)
+            throw new NotFoundException("Employee is terminated, no current salary found");
+        Salary currentSalary = new Salary();
+        Set<Salary> salaries = employee.get().getSalaries();
+        for (Salary s: salaries) {
+            if (s.getToDate() == null) {
+                currentSalary=s;
+            }
+        }
+        if(currentSalary==null){
+            throw new NotFoundException("No Salary Details found");
+        }
+       return modelMapper.map(currentSalary, SalaryDto.class);
 
     }
 

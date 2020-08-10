@@ -6,6 +6,7 @@ public enum DesignationType {
         SENIOR_MANAGER,
         SDE1,
         SDE2,
+        FREELANCER,
         ADMIN
 
 }

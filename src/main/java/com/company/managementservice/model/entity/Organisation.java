@@ -30,7 +30,7 @@ public class Organisation extends AbstractEntity<Integer> {
     @Column(name = "is_active")
     private Boolean isActive;
 
-    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinColumn(name = "organisation_id", referencedColumnName = "id")
     private Set<Department> department;
 

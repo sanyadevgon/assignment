@@ -2,7 +2,6 @@ package com.company.managementservice.controller;
 
 import com.company.managementservice.exception.NotFoundException;
 import com.company.managementservice.model.dto.SalaryDto;
-import com.company.managementservice.model.response.BaseMessageResponse;
 import com.company.managementservice.model.response.ServiceResponse;
 import com.company.managementservice.service.SalaryService;
 import lombok.NonNull;
@@ -30,29 +29,39 @@ public class SalaryController {
         log.info(
                 "SalaryController : postSalaryDetails : Received Request to post Salary Details " +
                 salaryDto.toString());
-        return new ServiceResponse<BaseMessageResponse>(
-                new BaseMessageResponse("Saved Successfully /n " + salaryService.saveSalary(id, salaryDto),
-                                        HttpStatus.OK, true));
-
-    }
-
-    @GetMapping(value = "/salaries/{id}")
-    public ServiceResponse<?> getEmployeeSalary(@NonNull @PathVariable Long id) throws NotFoundException {
-        log.info("SalaryController : getEmployeeSalary  : Received Request to get Employee Salary  :{}", id);
         return new ServiceResponse<>(
-                salaryService.getEmployeeSalary(id), HttpStatus.OK);
+                salaryService.saveSalary(id, salaryDto),
+                HttpStatus.OK);
 
     }
 
-    @PutMapping("/{id}")
-    public ServiceResponse<?> updateEmployeeDetails(@Valid @RequestBody SalaryDto salaryDto,
-                                                    @NonNull @PathVariable Long id)
+    @GetMapping(value = "/{employeeId}/details")
+    public ServiceResponse<?> getEmployeeSalary(@NonNull @PathVariable Long employeeId) throws NotFoundException {
+        log.info("SalaryController : getEmployeeSalary  : Received Request to get Employee Salary  :{}", employeeId);
+        return new ServiceResponse<>(
+                salaryService.getEmployeeSalary(employeeId), HttpStatus.OK);
+
+    }
+
+    @PutMapping("/{employeeId}/update")
+    public ServiceResponse<?> updateEmployeeSalary(@Valid @RequestBody SalaryDto salaryDto,
+                                                   @NonNull @PathVariable Long employeeId)
             throws NotFoundException {
-        log.info("SalaryController : putSalaryDetails : Received Request to put Salary Details   :{}", id);
-        return new ServiceResponse<BaseMessageResponse>(
-                new BaseMessageResponse(
-                        "Updated Successfully /n" + salaryService.UpdateSalary(salaryDto, id).toString(),
-                        HttpStatus.OK, true));
+        log.info("SalaryController : updateSalaryDetails : Received Request to update Salary Details   :{}",
+                 employeeId);
+        return new ServiceResponse<>(
+                salaryService.UpdateSalary(salaryDto, employeeId).toString(),
+                HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/{employeeId}/current-details")
+    public ServiceResponse<?> getEmployeeCurrentSalary(@NonNull @PathVariable Long employeeId)
+            throws NotFoundException {
+        log.info("SalaryController : getEmployeeCurrentSalary  : Received Request to get Employee Current Salary  :{}",
+                 employeeId);
+        return new ServiceResponse<>(
+                salaryService.getEmployeeCurrentSalary(employeeId), HttpStatus.OK);
+
     }
 
 }
