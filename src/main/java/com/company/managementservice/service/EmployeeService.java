@@ -11,8 +11,10 @@ import com.company.managementservice.model.entity.Organisation;
 import com.company.managementservice.model.entity.Salary;
 import com.company.managementservice.model.enums.DesignationType;
 import com.company.managementservice.repo.*;
+import com.sun.xml.bind.v2.TODO;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,6 +40,9 @@ EmployeeService {
     @Autowired
     private OrganisationDepartmentRepo organisationDepartmentRepo;
 
+    @Autowired
+    AuthService authService;
+
 
     @Autowired
     private OrganisationRepo organisationRepo;
@@ -48,9 +53,12 @@ EmployeeService {
         Employee employee = modelMapper.map(employeeDto, Employee.class);
         String employeeName = employee.getFirstName().toLowerCase();
         employee.setFirstName(employeeName);
+        employee.setIsActive(true);
         employeeRepo.save(employee);
         employeeDto.setId(employee.getId());
         return employeeDto;
+
+
     }
 
     public DepartmentDto putEmployeeToDepartment(Long employeeId, Long departmentId, Integer organisationId)
@@ -134,7 +142,9 @@ EmployeeService {
         if (!employee.isPresent())
             throw new NotFoundException("NOT FOUND employee id-{} " + id);
         EmployeeDto employeeDto= modelMapper.map(employee.get(), EmployeeDto.class);
-        employeeDto.setSalaries(employee.get().getSalaries());//?both sides in salary as well as employee
+        employeeDto.setHireDate(employee.get().getHireDate());
+        employeeDto.setTerminatedDate(employee.get().getTerminatedDate());
+       // employeeDto.setSalaries(employee.get().getSalaries());//?both sides in salary as well as employee
         return employeeDto;
 
     }
@@ -143,7 +153,11 @@ EmployeeService {
         Optional<Employee> employee = employeeRepo.findById(id);
         if (!employee.isPresent())
             throw new NotFoundException("NOT FOUND employee id-{} " + id);
+        if (employee.get().getTerminatedDate()!=null)
+            throw new NotFoundException("Employee terminated id-{} " + id);
+
         Employee employeeInfo = modelMapper.map(employeeDto, Employee.class);
+        employeeInfo.setIsActive(employee.get().getIsActive());
         employeeInfo.setId(id);
         employeeInfo.setCreatedAt(employee.get().getCreatedAt());
         employeeInfo.setCreatedBy(employee.get().getCreatedBy());
@@ -166,10 +180,14 @@ EmployeeService {
         for (Salary salary: salaries) {
             if (salary.getToDate() == null) {
                 salary.setToDate(LocalDate.now());
+                salaryRepo.save(salary);
             }
         }
         employeeRepo.save(employee.get());
         employeeRepo.removeEmployee(employeeId);
+        authService.removeAuthcache(employee.get());
     }
+
+
 }
 

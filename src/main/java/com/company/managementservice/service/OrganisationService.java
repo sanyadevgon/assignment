@@ -1,5 +1,6 @@
 package com.company.managementservice.service;
 
+import com.company.managementservice.constant.Constants;
 import com.company.managementservice.exception.NotFoundException;
 import com.company.managementservice.model.dto.OrganisationDto;
 import com.company.managementservice.model.entity.Department;
@@ -31,6 +32,7 @@ public class OrganisationService {
         Organisation organisation = modelMapper.map(organisationDto, Organisation.class);
         String organisationName = organisation.getName().toLowerCase();
         organisation.setName(organisationName);
+        organisation.setIsActive(true);
         repo.save(organisation);
         organisationDto.setId(organisation.getId());
         return modelMapper.map(organisation, OrganisationDto.class);
@@ -84,7 +86,7 @@ public class OrganisationService {
         organisation.get().setIsActive(false);
         organisation.get().getDepartment().clear();
         organisation.get().setUpdatedAt(LocalDateTime.now());
-        organisation.get().setUpdatedBy("admin");
+        organisation.get().setUpdatedBy(Constants.ADMIN);
 
     }
     @Transactional

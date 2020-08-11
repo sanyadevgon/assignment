@@ -55,7 +55,7 @@ public class EmployeeDto {
 
     private Long id;
 
-    private Set<Salary> salaries;
+    /*private Set<Salary> salaries;*/
 
     @JsonProperty("terminatedDate")//On termination data upadated otherwise null
     private LocalDate terminatedDate;

@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.persistence.Enumerated;
+import javax.validation.constraints.Min;
 import java.time.LocalDate;
 
 @Data
@@ -12,9 +14,11 @@ import java.time.LocalDate;
 @AllArgsConstructor
 public class SalaryDto {
 
+    @Min(value=0)
     @JsonProperty("amount")
     private Integer amount;
 
+    @Enumerated
     @JsonProperty("currency")
     private String currency;
 

@@ -1,6 +1,8 @@
 package com.company.managementservice.model.entity;
 
 import com.company.managementservice.constant.Constants;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -21,12 +23,16 @@ public abstract class AbstractEntity<T> {
     private T id;
 
 
+    @JsonIgnore
     private LocalDateTime createdAt;
 
+    @JsonIgnore
     private LocalDateTime updatedAt;
 
+    @JsonIgnore
     private String createdBy;
 
+    @JsonIgnore
     private String updatedBy;
 
     @PrePersist

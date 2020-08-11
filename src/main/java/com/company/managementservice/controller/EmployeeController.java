@@ -10,6 +10,7 @@ import com.company.managementservice.service.EmployeeService;
 import lombok.NonNull;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.validation.BindingResult;
@@ -20,7 +21,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 
 @Log4j2
-@RestController()
+@RestController
 @Validated
 @RequestMapping(value = "/employee", consumes = MediaType.APPLICATION_JSON_VALUE)
 public class EmployeeController {
@@ -104,7 +105,7 @@ public class EmployeeController {
     }
 
     @GetMapping(value = "/{employeeId}/details")
-    public ServiceResponse<?> getEmployeeDetails(@NonNull @PathVariable Long employeeId)
+    public ServiceResponse<?> getEmployeeDetails( @PathVariable @NonNull Long employeeId)
             throws NotFoundException, RequestRejectedException {
         log.info("EmployeeController : getEmployeeDetails  : Received Request to get Employee Details :{}", employeeId);
         if (employeeId == null)

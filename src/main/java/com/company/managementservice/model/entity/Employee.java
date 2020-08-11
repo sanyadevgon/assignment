@@ -1,6 +1,7 @@
 package com.company.managementservice.model.entity;
 
 import com.company.managementservice.model.enums.DesignationType;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -42,6 +43,7 @@ public class Employee extends AbstractEntity<Long> implements Serializable {
     @Column(name = "is_active")
     private Boolean isActive;
 
+    @JsonIgnore
     @Column(name = "hire_date")
     private LocalDate hireDate=LocalDate.now();
 

@@ -40,6 +40,7 @@ public class DepartmentService {
         Department department = modelMapper.map(departmentDto, Department.class);
         String departmentName = department.getName().toLowerCase();
         department.setName(departmentName);
+        department.setIsActive(true);
         departmentRepo.save(department);
         departmentDto.setId(department.getId());
         return modelMapper.map(department, DepartmentDto.class);
@@ -60,6 +61,7 @@ public class DepartmentService {
         if (!department.isPresent())
             throw new NotFoundException("NOT FOUND department id-" + id);
         Department departmentInfo = modelMapper.map(departmentDto, Department.class);
+        departmentInfo.setIsActive(department.get().getIsActive());
         departmentInfo.setId(id);
         departmentInfo.setCreatedAt(department.get().getCreatedAt());
         departmentInfo.setCreatedBy(department.get().getCreatedBy());

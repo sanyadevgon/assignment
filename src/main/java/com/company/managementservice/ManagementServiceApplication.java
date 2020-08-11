@@ -1,24 +1,14 @@
 package com.company.managementservice;
 
-import com.company.managementservice.model.entity.Department;
-import com.company.managementservice.model.entity.Employee;
-import com.company.managementservice.model.entity.Organisation;
-import com.company.managementservice.model.enums.DesignationType;
-import com.company.managementservice.repo.DepartmentRepo;
-import com.company.managementservice.repo.EmployeeRepo;
-import com.company.managementservice.repo.OrganisationDepartmentRepo;
-import com.company.managementservice.repo.OrganisationRepo;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 
-import java.util.HashSet;
-import java.util.Set;
-
 @SpringBootApplication
+@EnableCaching
 public class ManagementServiceApplication /*implements CommandLineRunner*/{
 
 	public static void main(String[] args) {
@@ -29,6 +19,12 @@ public class ManagementServiceApplication /*implements CommandLineRunner*/{
 	public static NoOpPasswordEncoder passwordEncoder() {
 		return (NoOpPasswordEncoder) NoOpPasswordEncoder.getInstance();
 	}
+
+	/*@Bean
+	public PasswordEncoder getPasswordEncoder(){
+		return new BCryptPasswordEncoder();
+	}*/
+
 
 	/*@Autowired
 	EmployeeRepo employeeRepo;
