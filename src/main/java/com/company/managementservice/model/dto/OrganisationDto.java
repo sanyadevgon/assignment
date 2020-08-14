@@ -8,13 +8,14 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotBlank;
+import java.io.Serializable;
 import java.util.Set;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode
-public class OrganisationDto {
+public class OrganisationDto implements Serializable {
 
     @NotBlank(message = "Please provide a name")
     @JsonProperty("name")
@@ -39,5 +40,5 @@ public class OrganisationDto {
 
     private Integer id;
 
-    private Set<Department> department;
+    private Set<DepartmentDto> department;
 }

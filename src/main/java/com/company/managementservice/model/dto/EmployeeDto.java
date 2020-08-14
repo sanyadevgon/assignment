@@ -9,13 +9,14 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.Enumerated;
 import javax.validation.constraints.*;
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.Set;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class EmployeeDto {
+public class EmployeeDto implements Serializable {
 
     @NotBlank(message = "Please provide a name")
     @JsonProperty("firstName")

@@ -6,6 +6,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.Set;
 
 @Entity
@@ -14,7 +15,7 @@ import java.util.Set;
 @NoArgsConstructor
 @Data
 @EqualsAndHashCode
-public class Department extends AbstractEntity<Long> {
+public class Department extends AbstractEntity<Long> implements Serializable {
 
     @Column(name = "name")
     private String name;

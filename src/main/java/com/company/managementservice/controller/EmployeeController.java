@@ -63,7 +63,7 @@ public class EmployeeController {
 
         return new ServiceResponse<>(
                 new BaseMessageResponse(
-                        employeeService.putEmployeeToDepartment(employeeId, departmentId, organisationId),
+                        employeeService.putEmployeeToDepartment(departmentId, organisationId,employeeId),
                         HttpStatus.OK, true));
 
     }

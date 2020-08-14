@@ -7,14 +7,19 @@ import com.company.managementservice.model.entity.Department;
 import com.company.managementservice.model.entity.Organisation;
 import com.company.managementservice.repo.DepartmentRepo;
 import com.company.managementservice.repo.OrganisationRepo;
+import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.*;
 
+@Log4j2
 @Service
 @Transactional
 public class OrganisationService {
@@ -27,6 +32,9 @@ public class OrganisationService {
 
     private ModelMapper modelMapper = new ModelMapper();
 
+    @Autowired
+    OrganisationRepo organisationRepo;
+
     public OrganisationDto saveOrganisation(OrganisationDto organisationDto) {
 
         Organisation organisation = modelMapper.map(organisationDto, Organisation.class);
@@ -35,33 +43,42 @@ public class OrganisationService {
         organisation.setIsActive(true);
         repo.save(organisation);
         organisationDto.setId(organisation.getId());
+        log.info("saveOrganisation: saving organisation to db :{}", organisationDto);
         return modelMapper.map(organisation, OrganisationDto.class);
 
     }
 
-    public OrganisationDto getOrganisation(Integer id) throws NotFoundException {
-        Optional<Organisation> organisation = repo.findById(id);
+    @Cacheable(cacheNames = "organisationU", key = "#organisationId")
+    public OrganisationDto getOrganisation(Integer organisationId) throws NotFoundException {
+        Optional<Organisation> organisation = repo.findById(organisationId);
         if (!organisation.isPresent())
-            throw new NotFoundException("NOT FOUND organisation id-" + id);
-
+            throw new NotFoundException("NOT FOUND organisation id-" + organisationId);
+        log.info("getOrganisation: get organisation from db id :{}", organisation.toString());
+        // Set<Department> departments=organisation.get().getDepartment();
+       /* for(Department department:departments){
+           organisationDto showind departments id as null
+        }*/
         return modelMapper.map(organisation.get(), OrganisationDto.class);
+
     }
 
-    public OrganisationDto updateOrganisation(OrganisationDto organisationDto, Integer id) throws NotFoundException {
-        Optional<Organisation> organisation = repo.findById(id);
+    @CachePut(cacheNames = "organisationU", key = "#organisationId")
+    public OrganisationDto updateOrganisation(Integer organisationId, OrganisationDto organisationDto)
+            throws NotFoundException {
+        Optional<Organisation> organisation = repo.findById(organisationId);
         if (!organisation.isPresent())
-            throw new NotFoundException("NOT FOUND id organisation-" + id);
+            throw new NotFoundException("NOT FOUND id organisation-" + organisationId);
         Organisation organisationInfo = modelMapper.map(organisationDto, Organisation.class);
-        organisationInfo.setId(id);
+        organisationInfo.setId(organisationId);
         organisationInfo.setCreatedAt(organisation.get().getCreatedAt());
         organisationInfo.setCreatedBy(organisation.get().getCreatedBy());
         organisationInfo.setIsActive(organisation.get().getIsActive());
         repo.save(organisationInfo);
         return modelMapper.map(organisationInfo, OrganisationDto.class);
-
     }
 
-    public void removeDepartment(Integer organisationId, Long departmentId) throws NotFoundException {
+    @CachePut(cacheNames = "organisationU", key = "#organisationId")
+    public OrganisationDto removeDepartment(Integer organisationId, Long departmentId) throws NotFoundException {
         Optional<Organisation> organisation = repo.findById(organisationId);
         if (!organisation.isPresent())
             throw new NotFoundException("NOT FOUND id organisation-" + organisationId);
@@ -76,9 +93,11 @@ public class OrganisationService {
                 break;
             }
         }
+        return modelMapper.map(organisation.get(), OrganisationDto.class);
 
     }
 
+    @CacheEvict(cacheNames = "organisationU", key = "#organisationId")
     public void removeOrganisation(Integer organisationId) throws NotFoundException {
         Optional<Organisation> organisation = repo.findById(organisationId);
         if (!organisation.isPresent())
@@ -87,21 +106,45 @@ public class OrganisationService {
         organisation.get().getDepartment().clear();
         organisation.get().setUpdatedAt(LocalDateTime.now());
         organisation.get().setUpdatedBy(Constants.ADMIN);
-
     }
+
     @Transactional
-    public Set<Map<String,Object>> getAllDepartments(Integer organisationId) throws NotFoundException {
+    public Set<Map<String, Object>> getAllDepartments(Integer organisationId) throws NotFoundException {
         Optional<Organisation> organisation = repo.findById(organisationId);
         if (!organisation.isPresent())
             throw new NotFoundException("NOT FOUND id organisation-" + organisationId);
-        Set<Map<String,Object>> departments = new HashSet<>();
-        for (Department department: organisation.get().getDepartment()){
-            HashMap<String,Object> names= new HashMap<>();
-            names.put("name",department.getName());
-            names.put("id",department.getId());
+        Set<Map<String, Object>> departments = new HashSet<>();
+        log.info("Fetching  departments of organisation from database");
+        for (Department department: organisation.get().getDepartment()) {
+            HashMap<String, Object> names = new HashMap<>();
+            names.put("name", department.getName());
+            names.put("id", department.getId());
             departments.add(names);
         }
         return departments;
     }
 
+    @CachePut(cacheNames = "organisationU", key = "#organisationId")
+    public OrganisationDto updateDepartmentCache(Integer organisationId, Long departmentId) {
+        Optional<Organisation> organisation = organisationRepo.findById(organisationId);
+        return modelMapper.map(organisation.get(), OrganisationDto.class);
+    }
+
+    @CachePut(cacheNames = "organisationU", key = "#organisationId")
+    public OrganisationDto removeDepartmentCache(Integer organisationId, Long departmentId) {
+        Optional<Organisation> organisation = organisationRepo.findById(organisationId);
+        return modelMapper.map(organisation.get(), OrganisationDto.class);
+    }
+
+    @CachePut(cacheNames = "organisationU", key = "#organisationId")
+    public OrganisationDto removeEmployeeCache(Integer organisationId, Long departmentId) {
+        Optional<Organisation> organisation = organisationRepo.findById(organisationId);
+        return modelMapper.map(organisation.get(), OrganisationDto.class);
+    }
+
+    @CachePut(cacheNames = "organisationU", key = "#organisationId")
+    public OrganisationDto updateEmployeeCache(Integer organisationId, Long departmentId) {
+        Optional<Organisation> organisation = organisationRepo.findById(organisationId);
+        return modelMapper.map(organisation.get(), OrganisationDto.class);
+    }
 }

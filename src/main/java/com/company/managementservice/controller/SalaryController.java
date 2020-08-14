@@ -1,7 +1,9 @@
 package com.company.managementservice.controller;
 
+import com.company.managementservice.exception.EmptyBodyException;
 import com.company.managementservice.exception.NotFoundException;
 import com.company.managementservice.model.dto.SalaryDto;
+import com.company.managementservice.model.response.BaseMessageResponse;
 import com.company.managementservice.model.response.ServiceResponse;
 import com.company.managementservice.service.SalaryService;
 import lombok.NonNull;
@@ -30,8 +32,8 @@ public class SalaryController {
                 "SalaryController : postSalaryDetails : Received Request to post Salary Details " +
                 salaryDto.toString());
         return new ServiceResponse<>(
-                salaryService.saveSalary(id, salaryDto),
-                HttpStatus.OK);
+                new BaseMessageResponse(salaryService.saveSalary(id, salaryDto),
+                                        HttpStatus.OK, true));
 
     }
 
@@ -50,8 +52,8 @@ public class SalaryController {
         log.info("SalaryController : updateSalaryDetails : Received Request to update Salary Details   :{}",
                  employeeId);
         return new ServiceResponse<>(
-                salaryService.UpdateSalary(salaryDto, employeeId).toString(),
-                HttpStatus.OK);
+                new BaseMessageResponse(salaryService.UpdateSalary(salaryDto, employeeId),
+                                        HttpStatus.OK, true));
     }
 
     @GetMapping(value = "/{employeeId}/current-details")

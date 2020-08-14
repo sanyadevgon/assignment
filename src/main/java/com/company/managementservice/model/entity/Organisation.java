@@ -3,6 +3,7 @@ package com.company.managementservice.model.entity;
 import lombok.*;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.Set;
 
 @Entity
@@ -10,7 +11,7 @@ import java.util.Set;
 @Table(name = "organisation", uniqueConstraints = {@UniqueConstraint(columnNames = {"name", "type"})})
 @AllArgsConstructor
 @NoArgsConstructor
-public class Organisation extends AbstractEntity<Integer> {
+public class Organisation extends AbstractEntity<Integer> implements Serializable {
 
     @Column(name = "name")
     private String name;

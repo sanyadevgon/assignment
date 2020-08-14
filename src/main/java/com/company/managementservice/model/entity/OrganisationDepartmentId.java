@@ -1,6 +1,7 @@
 package com.company.managementservice.model.entity;
 
 import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.Column;
@@ -10,10 +11,11 @@ import java.io.Serializable;
 @Embeddable
 @AllArgsConstructor
 @NoArgsConstructor
+@Data
 public class OrganisationDepartmentId implements Serializable {
 
     @Column(name = "organisation_id")
-    private Long organisationId;
+    private Integer organisationId;
 
     @Column(name = "department_id")
     private Long departmentId;

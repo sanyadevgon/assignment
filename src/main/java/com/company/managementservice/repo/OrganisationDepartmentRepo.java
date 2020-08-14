@@ -8,6 +8,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 
 @Repository
 public interface OrganisationDepartmentRepo extends JpaRepository<OrganisationDepartment,Long> {
@@ -19,6 +20,9 @@ public interface OrganisationDepartmentRepo extends JpaRepository<OrganisationDe
 
     @Query(value="select count(od) from OrganisationDepartment od where department_id=:deptId and organisation_id=:organId")
     public Integer findOrganisationByDepartment(@Param("deptId") Long deptId,@Param("organId") Integer organId);
+
+    @Query(value="select od from OrganisationDepartment od where department_id=:deptId")
+    public List<OrganisationDepartment> updateDepartmentInOrganCache(@Param("deptId") Long deptId);
 
 
 }

@@ -10,16 +10,21 @@ import com.company.managementservice.model.entity.Organisation;
 import com.company.managementservice.repo.DepartmentRepo;
 import com.company.managementservice.repo.OrganisationDepartmentRepo;
 import com.company.managementservice.repo.OrganisationRepo;
+import com.sun.xml.bind.v2.TODO;
+import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+@Log4j2
 @Service
 @Transactional
 public class DepartmentService {
@@ -32,6 +37,9 @@ public class DepartmentService {
 
     @Autowired
     private OrganisationDepartmentRepo organisationDepartmentRepo;
+
+    @Autowired
+    private CacheService cacheService;
 
     private ModelMapper modelMapper = new ModelMapper();
 
@@ -46,36 +54,41 @@ public class DepartmentService {
         return modelMapper.map(department, DepartmentDto.class);
     }
 
-    public DepartmentDto getDepartment(Long id) throws NotFoundException {
-
-        Optional<Department> department = departmentRepo.findById(id);
+    @Cacheable(cacheNames = "department", key = "#departmentId")
+    public DepartmentDto getDepartment(Long departmentId) throws NotFoundException {
+        Optional<Department> department = departmentRepo.findById(departmentId);
         if (!department.isPresent())
-            throw new NotFoundException("NOT FOUND department id-{} " + id);
+            throw new NotFoundException("NOT FOUND department id-{} " + departmentId);
+        log.info("getDepartment: get Department from db :{}",departmentId);
         DepartmentDto departmentDto = modelMapper.map(department.get(), DepartmentDto.class);
-        departmentDto.setEmployees(department.get().getEmployees());
+        //departmentDto.setEmployees(department.get().getEmployees());
         return departmentDto;
     }
 
-    public DepartmentDto updateDepartment(DepartmentDto departmentDto, Long id) throws NotFoundException {
-        Optional<Department> department = departmentRepo.findById(id);
+    @CachePut(cacheNames = "department", key = "#departmentId")
+    public DepartmentDto updateDepartment(Long departmentId, DepartmentDto departmentDto) throws NotFoundException {
+        Optional<Department> department = departmentRepo.findById(departmentId);
         if (!department.isPresent())
-            throw new NotFoundException("NOT FOUND department id-" + id);
+            throw new NotFoundException("NOT FOUND department id-" + departmentId);
+        log.info("updateDepartment: update Department in db :{}",departmentId);
         Department departmentInfo = modelMapper.map(departmentDto, Department.class);
         departmentInfo.setIsActive(department.get().getIsActive());
-        departmentInfo.setId(id);
+        departmentInfo.setId(departmentId);
         departmentInfo.setCreatedAt(department.get().getCreatedAt());
         departmentInfo.setCreatedBy(department.get().getCreatedBy());
         departmentInfo.setIsActive(department.get().getIsActive());
         departmentInfo.setEmployees(department.get().getEmployees());
         departmentRepo.save(departmentInfo);
+        cacheService.updateDepartmentCache(departmentId);
         return modelMapper.map(departmentInfo, DepartmentDto.class);
 
     }
 
-    public DepartmentDto postDepartmentInCompany(DepartmentDto departmentDto, Integer id) throws NotFoundException {
-        Optional<Organisation> organisation = organisationRepo.findById(id);
+    //not considering this one
+    public DepartmentDto postDepartmentInCompany(Integer organisationId, DepartmentDto departmentDto) throws NotFoundException {
+        Optional<Organisation> organisation = organisationRepo.findById(organisationId);
         if (!organisation.isPresent())
-            throw new NotFoundException("NOT FOUND organisation id-" + id);
+            throw new NotFoundException("NOT FOUND organisation id-" + organisationId);
         Department department = departmentRepo.save(modelMapper.map(departmentDto, Department.class));
         departmentDto.setId(department.getId());
         Set<Department> departments = organisation.get().getDepartment();
@@ -86,18 +99,19 @@ public class DepartmentService {
 
     }//not considering direct posting department to organisation
 
-    public OrganisationDto putDepartmentToOrganisation(Integer companyId, Long departmentId) throws NotFoundException {
+    @CachePut(cacheNames = "organisationU",key = "#organisationId")
+    public OrganisationDto putDepartmentToOrganisation(Integer organisationId, Long departmentId) throws NotFoundException {
         Optional<Department> department = departmentRepo.findById(departmentId);
-        Optional<Organisation> organisation = organisationRepo.findById(companyId);
+        Optional<Organisation> organisation = organisationRepo.findById(organisationId);
 
         if (!department.isPresent())
             throw new NotFoundException("NOT FOUND department id- " + departmentId);
         if (!organisation.isPresent())
-            throw new NotFoundException("NOT FOUND organisation id- " + companyId);
+            throw new NotFoundException("NOT FOUND organisation id- " + organisationId);
         if (department.get().getIsActive()==false)
-            throw new NotFoundException("Department is not active with trying change its status to active first- " + departmentId);
+            throw new NotFoundException("Department is not active" + departmentId);
         if (organisation.get().getIsActive()==false)
-            throw new NotFoundException("organisation is not active with trying change its status to active first- " + companyId);
+            throw new NotFoundException("organisation is not active with trying change its status to active first- " + organisationId);
         Set<Department> departments = organisation.get().getDepartment();
         departments.add(department.get());
         organisation.get().setDepartment(departments);
@@ -107,6 +121,7 @@ public class DepartmentService {
 
     }
 
+    @CacheEvict(cacheNames = "department", key = "#departmentId")
     public void removeDepartment(Long departmentId) throws NotFoundException {
         Optional<Department> department = departmentRepo.findById(departmentId);
         if (!department.isPresent())
@@ -116,6 +131,7 @@ public class DepartmentService {
         department.get().setUpdatedBy(Constants.ADMIN);
         department.get().getEmployees().clear();
         departmentRepo.save(department.get());
+        cacheService.removeDepartmentCache(departmentId);
         organisationDepartmentRepo.removeDepartment(departmentId);
     }
 

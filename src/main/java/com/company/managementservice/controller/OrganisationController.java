@@ -61,9 +61,10 @@ public class OrganisationController {
     }
 
     @PutMapping("/{organisationId}/update-details")
-    public ResponseEntity<?> updateOrganisation(@Valid @RequestBody OrganisationDto organisationDto,
-                                                BindingResult bindingResult,
-                                                @PathVariable Integer organisationId)
+    public ResponseEntity<?> updateOrganisation(@PathVariable Integer organisationId,
+                                                @Valid @RequestBody OrganisationDto organisationDto,
+                                                BindingResult bindingResult
+    )
             throws NotFoundException, MethodArgumentNotValidException {
         log.info("OrganisationController : PutOrganisationDetails : Received Request to put Organisation Details  :{}",
                  organisationId);
@@ -75,7 +76,7 @@ public class OrganisationController {
             throw new MethodArgumentNotValidException(errMsg);
         }
         return new ServiceResponse<>(
-                new BaseMessageResponse<>(organisationService.updateOrganisation(organisationDto, organisationId),
+                new BaseMessageResponse<>(organisationService.updateOrganisation( organisationId, organisationDto),
                                           HttpStatus.OK, true));
     }
 
