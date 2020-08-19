@@ -25,7 +25,7 @@ public class DepartmentDto implements Serializable {
     private String address;
 
     @JsonProperty("is_active")
-    private Boolean isActive;
+    private Boolean isActive=true;
 
     private Long id;
 

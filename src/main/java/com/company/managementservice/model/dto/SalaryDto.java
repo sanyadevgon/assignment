@@ -1,6 +1,6 @@
 package com.company.managementservice.model.dto;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.company.managementservice.model.enums.CurrencyType;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;

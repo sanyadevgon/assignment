@@ -10,7 +10,6 @@ import com.company.managementservice.model.entity.Organisation;
 import com.company.managementservice.repo.DepartmentRepo;
 import com.company.managementservice.repo.OrganisationDepartmentRepo;
 import com.company.managementservice.repo.OrganisationRepo;
-import com.sun.xml.bind.v2.TODO;
 import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,6 +48,7 @@ public class DepartmentService {
         String departmentName = department.getName().toLowerCase();
         department.setName(departmentName);
         department.setIsActive(true);
+        department.setCreatedBy(Constants.ADMIN);
         departmentRepo.save(department);
         departmentDto.setId(department.getId());
         return modelMapper.map(department, DepartmentDto.class);
@@ -61,7 +61,6 @@ public class DepartmentService {
             throw new NotFoundException("NOT FOUND department id-{} " + departmentId);
         log.info("getDepartment: get Department from db :{}",departmentId);
         DepartmentDto departmentDto = modelMapper.map(department.get(), DepartmentDto.class);
-        //departmentDto.setEmployees(department.get().getEmployees());
         return departmentDto;
     }
 
@@ -83,21 +82,6 @@ public class DepartmentService {
         return modelMapper.map(departmentInfo, DepartmentDto.class);
 
     }
-
-    //not considering this one
-    public DepartmentDto postDepartmentInCompany(Integer organisationId, DepartmentDto departmentDto) throws NotFoundException {
-        Optional<Organisation> organisation = organisationRepo.findById(organisationId);
-        if (!organisation.isPresent())
-            throw new NotFoundException("NOT FOUND organisation id-" + organisationId);
-        Department department = departmentRepo.save(modelMapper.map(departmentDto, Department.class));
-        departmentDto.setId(department.getId());
-        Set<Department> departments = organisation.get().getDepartment();
-        departments.add(department);
-        organisation.get().setDepartment(departments);
-        organisationRepo.save(organisation.get());
-        return modelMapper.map(departmentDto, DepartmentDto.class);
-
-    }//not considering direct posting department to organisation
 
     @CachePut(cacheNames = "organisationU",key = "#organisationId")
     public OrganisationDto putDepartmentToOrganisation(Integer organisationId, Long departmentId) throws NotFoundException {

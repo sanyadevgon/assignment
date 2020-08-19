@@ -1,5 +1,6 @@
 package com.company.managementservice.service;
 
+import com.company.managementservice.exception.NotFoundException;
 import com.company.managementservice.model.dto.OrganisationDto;
 import com.company.managementservice.model.entity.Employee;
 import com.company.managementservice.model.entity.Organisation;
@@ -28,15 +29,15 @@ public class AuthService {
 
     private ModelMapper modelMapper = new ModelMapper();
 
-    @Cacheable(cacheNames = "Authenticator", key = "#firstname")
-    public User loadByFirstname(String firstname) {
+    @Cacheable(cacheNames = "Authenticator", key = "#employeeId")
+    public User loadByFirstname(String employeeId) {
         return employeeRepo
-                .findByfirstName(firstname)
+                .findById(Long.valueOf(employeeId))
                 .map(u -> {
                          String arr[] = new String[1];
                          arr[0] = "ROLE_" + u.getDesignationType().toString().toUpperCase();
                          return new org.springframework.security.core.userdetails.User(
-                                 u.getFirstName(),//username
+                                 String.valueOf(u.getId()),//username
                                  u.getLastName(),//password
                                  u.getIsActive(),
                                  u.getIsActive(),
@@ -45,18 +46,21 @@ public class AuthService {
                                  AuthorityUtils.createAuthorityList(arr[0]));
                      }
                 ).orElseThrow(() -> new UsernameNotFoundException("No user with "
-                                                                  + "the name " + firstname +
+                                                                  + "the name " + employeeId +
                                                                   "was found in the database"));
 
     }
 
-    @CacheEvict(cacheNames = "Authenticator", key = "#employee.firstName")
+    @CacheEvict(cacheNames = "Authenticator", key = "#employee.id")
     public void removeAuthcache(Employee employee) {
     }
 
     @CachePut(cacheNames = "organisationU", key = "#organisationId")
-    public OrganisationDto addEmployeeToDepartment(Integer organisationId) {
+    public OrganisationDto addEmployeeToDepartment(Integer organisationId) throws NotFoundException {
         Optional<Organisation> organisation = organisationRepo.findById(organisationId);
+        if(!organisation.isPresent()){
+            throw  new NotFoundException("Not found organisation");
+        }
         return modelMapper.map(organisation.get(),OrganisationDto.class);
     }
 

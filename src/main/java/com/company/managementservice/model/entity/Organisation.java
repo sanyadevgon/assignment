@@ -8,7 +8,7 @@ import java.util.Set;
 
 @Entity
 @Data
-@Table(name = "organisation", uniqueConstraints = {@UniqueConstraint(columnNames = {"name", "type"})})
+@Table(name = "organisation", uniqueConstraints = {@UniqueConstraint(columnNames = {"name"})})
 @AllArgsConstructor
 @NoArgsConstructor
 public class Organisation extends AbstractEntity<Integer> implements Serializable {

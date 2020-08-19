@@ -1,7 +1,7 @@
 package com.company.managementservice.model.entity;
 
+import com.company.managementservice.model.enums.CurrencyType;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 

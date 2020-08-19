@@ -1,6 +1,5 @@
 package com.company.managementservice.model.dto;
 
-import com.company.managementservice.model.entity.Department;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -8,6 +7,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Pattern;
 import java.io.Serializable;
 import java.util.Set;
 
@@ -32,11 +32,13 @@ public class OrganisationDto implements Serializable {
     @JsonProperty("ceo")
     private Long ceo;
 
+    @Pattern(
+            regexp = "^(http:\\/\\/www\\.|https:\\/\\/www\\.|http:\\/\\/|https:\\/\\/)?[a-z0-9]+([\\-\\.]{1}[a-z0-9]+)\\.[a-z]{2,5}(:[0-9]{1,5})?(\\/.)?$")
     @JsonProperty("url")
     private String url;
 
     @JsonProperty("is_active")
-    private Boolean isActive;
+    private Boolean isActive=true;
 
     private Integer id;
 

@@ -26,7 +26,7 @@ public class EmployeeDto implements Serializable {
     private String lastName;
 
     @NotBlank(message = "Please provide an email")
-    @Email
+    @Pattern(regexp = "^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$")
     @JsonProperty("emailId")
     private String emailId;
 
@@ -56,9 +56,7 @@ public class EmployeeDto implements Serializable {
 
     private Long id;
 
-    /*private Set<Salary> salaries;*/
-
-    @JsonProperty("terminatedDate")//On termination data upadated otherwise null
+    @JsonProperty("terminatedDate")
     private LocalDate terminatedDate;
 
 }

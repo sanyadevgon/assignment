@@ -4,6 +4,7 @@ import com.company.managementservice.constant.Constants;
 import com.company.managementservice.exception.NotFoundException;
 import com.company.managementservice.model.dto.DepartmentDto;
 import com.company.managementservice.model.dto.EmployeeDto;
+import com.company.managementservice.model.dto.EmployeeInfoDto;
 import com.company.managementservice.model.dto.OrganisationDto;
 import com.company.managementservice.model.entity.Department;
 import com.company.managementservice.model.entity.Employee;
@@ -23,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -53,12 +55,12 @@ EmployeeService {
     private ModelMapper modelMapper = new ModelMapper();
 
     @Autowired
-    private  CacheService cacheService;
+    private CacheService cacheService;
 
     public EmployeeDto saveEmployee(EmployeeDto employeeDto) {
         Employee employee = modelMapper.map(employeeDto, Employee.class);
-        String employeeName = employee.getFirstName().toLowerCase();
-        employee.setFirstName(employeeName);
+        employee.setLastName(employee.getLastName().toLowerCase());
+        employee.setFirstName(employee.getFirstName().toLowerCase());
         employee.setIsActive(true);
         employeeRepo.save(employee);
         employeeDto.setId(employee.getId());
@@ -71,7 +73,6 @@ EmployeeService {
         Optional<Department> department = departmentRepo.findById(departmentId);
         Optional<Employee> employee = employeeRepo.findById(employeeId);
         Optional<Organisation> organisation = organisationRepo.findById(organisationId);
-
         if (!department.isPresent())
             throw new NotFoundException("NOT FOUND department id- {}" + departmentId);
         if (!employee.isPresent())
@@ -96,9 +97,8 @@ EmployeeService {
         return departmentDto;
     }
 
-    @CachePut(cacheNames = "department", key = "#departmentId")////////also for organisationId
-    //TODO
-    public OrganisationDto putFreelancerEmployeeToOrganiation(Long employeeId, Integer organisationId)
+    @CachePut(cacheNames = "department", key = "10")
+    public DepartmentDto putFreelancerEmployeeToOrganiation(Long employeeId, Integer organisationId)
             throws NotFoundException {
         Optional<Employee> employee = employeeRepo.findById(employeeId);
         Optional<Organisation> organisation = organisationRepo.findById(organisationId);
@@ -124,7 +124,7 @@ EmployeeService {
         OrganisationDto organisationDto = modelMapper.map(organisation.get(), OrganisationDto.class);
         organisationRepo.save(organisation.get());
         authService.addEmployeeToDepartment(organisationId);
-        return organisationDto;
+        return modelMapper.map(departmentfree.get(), DepartmentDto.class);
 
     }
 
@@ -141,7 +141,7 @@ EmployeeService {
         for (Employee employee1: employees) {
             if (employee1.getId() == employeeId)
                 department.get().getEmployees().remove(employee1);
-        }//doubt-solved departmentRepo.save(department.get());, not req hibernate delete query works here
+        }
         cacheService.removeEmployeeCache(departmentId);
         return modelMapper.map(department.get(), DepartmentDto.class);
     }
@@ -155,9 +155,15 @@ EmployeeService {
         EmployeeDto employeeDto = modelMapper.map(employee.get(), EmployeeDto.class);
         employeeDto.setHireDate(employee.get().getHireDate());
         employeeDto.setTerminatedDate(employee.get().getTerminatedDate());
-        // employeeDto.setSalaries(employee.get().getSalaries());//?both sides in salary as well as employee
         return employeeDto;
+    }
 
+    public EmployeeInfoDto getEmployeeInfo(Long employeeId) throws NotFoundException {
+        Optional<Employee> employee = employeeRepo.findById(employeeId);
+        if (!employee.isPresent())
+            throw new NotFoundException("NOT FOUND employee id-{} " + employeeId);
+        log.info("employeeService :getEmployee: getEmployee from db :{}", employeeId);
+        return modelMapper.map(employee.get(), EmployeeInfoDto.class);
     }
 
     @CachePut(cacheNames = "employee", key = "#employeeId")
@@ -171,6 +177,7 @@ EmployeeService {
         Employee employeeInfo = modelMapper.map(employeeDto, Employee.class);
         employeeInfo.setIsActive(employee.get().getIsActive());
         employeeInfo.setId(employeeId);
+        employeeInfo.setFirstName(employeeDto.getFirstName());
         employeeInfo.setCreatedAt(employee.get().getCreatedAt());
         employeeInfo.setCreatedBy(employee.get().getCreatedBy());
         employeeInfo.setHireDate(employee.get().getHireDate());
@@ -199,9 +206,15 @@ EmployeeService {
             }
         }
         employeeRepo.save(employee.get());
-        cacheService.getEmployeeDepartmentIdForRemoval(employeeId);
+        Long departmentId = employeeRepo.getDepartmentId(employeeId);
+        cacheService.removeEmployeeCache(departmentId, employeeId);
         employeeRepo.removeEmployee(employeeId);
         authService.removeAuthcache(employee.get());
+    }
+
+    public List<Employee> employeeOnBench() {
+        List<Employee> employeeList = employeeRepo.employeeesOnBench();
+        return employeeList;
     }
 
 }

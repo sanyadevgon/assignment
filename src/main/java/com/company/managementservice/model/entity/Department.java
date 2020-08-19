@@ -10,7 +10,7 @@ import java.io.Serializable;
 import java.util.Set;
 
 @Entity
-@Table(name = "department",uniqueConstraints = {@UniqueConstraint(columnNames={"name","address"})})
+@Table(name = "department",uniqueConstraints = {@UniqueConstraint(columnNames={"name"})})
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
@@ -27,7 +27,6 @@ public class Department extends AbstractEntity<Long> implements Serializable {
     private Boolean isActive;
 
     @OneToMany(fetch = FetchType.EAGER)
-    //@JoinColumn(name = "department_id", referencedColumnName = "id")
     private Set<Employee> employees;
 
 

@@ -1,11 +1,17 @@
 package com.company.managementservice.service;
 
 import com.company.managementservice.constant.Constants;
+import com.company.managementservice.exception.ConstraintViolationException;
+import com.company.managementservice.exception.DublicateDataException;
 import com.company.managementservice.exception.NotFoundException;
 import com.company.managementservice.model.dto.OrganisationDto;
+import com.company.managementservice.model.dto.OrganisationInfoDto;
 import com.company.managementservice.model.entity.Department;
+import com.company.managementservice.model.entity.Employee;
 import com.company.managementservice.model.entity.Organisation;
+import com.company.managementservice.model.enums.DesignationType;
 import com.company.managementservice.repo.DepartmentRepo;
+import com.company.managementservice.repo.EmployeeRepo;
 import com.company.managementservice.repo.OrganisationRepo;
 import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
@@ -30,15 +36,32 @@ public class OrganisationService {
     @Autowired
     DepartmentRepo departmentRepo;
 
-    private ModelMapper modelMapper = new ModelMapper();
-
     @Autowired
     OrganisationRepo organisationRepo;
 
-    public OrganisationDto saveOrganisation(OrganisationDto organisationDto) {
+    @Autowired
+    EmployeeRepo employeeRepo;
+
+    private ModelMapper modelMapper = new ModelMapper();
+
+    public OrganisationDto saveOrganisation(OrganisationDto organisationDto)
+            throws NotFoundException, DublicateDataException, ConstraintViolationException {
 
         Organisation organisation = modelMapper.map(organisationDto, Organisation.class);
         String organisationName = organisation.getName().toLowerCase();
+        if (organisationDto.getCeo() == null) {
+            throw new DublicateDataException("Provide valid employee id in type Long");
+        }
+        Optional<Employee> employee = employeeRepo.findById(organisationDto.getCeo());
+        if (employee.isPresent()) {
+            if (employee.get().getDesignationType() != DesignationType.CEO) {
+                throw new DublicateDataException("Employee with above id does not have designation CEO, not found ceo");
+            }
+            if (employee.get().getTerminatedDate() != null) {
+                throw new NotFoundException("Employee(CEO) with above id left organisation, is terminated");
+            }
+        }
+
         organisation.setName(organisationName);
         organisation.setIsActive(true);
         repo.save(organisation);
@@ -54,10 +77,6 @@ public class OrganisationService {
         if (!organisation.isPresent())
             throw new NotFoundException("NOT FOUND organisation id-" + organisationId);
         log.info("getOrganisation: get organisation from db id :{}", organisation.toString());
-        // Set<Department> departments=organisation.get().getDepartment();
-       /* for(Department department:departments){
-           organisationDto showind departments id as null
-        }*/
         return modelMapper.map(organisation.get(), OrganisationDto.class);
 
     }
@@ -68,11 +87,15 @@ public class OrganisationService {
         Optional<Organisation> organisation = repo.findById(organisationId);
         if (!organisation.isPresent())
             throw new NotFoundException("NOT FOUND id organisation-" + organisationId);
+        else if (organisation.get().getIsActive() == false)
+            throw new NotFoundException("Organisation is non active-" + organisationId);
         Organisation organisationInfo = modelMapper.map(organisationDto, Organisation.class);
         organisationInfo.setId(organisationId);
         organisationInfo.setCreatedAt(organisation.get().getCreatedAt());
         organisationInfo.setCreatedBy(organisation.get().getCreatedBy());
         organisationInfo.setIsActive(organisation.get().getIsActive());
+        organisationInfo.setCeo(organisation.get().getCeo());
+        organisationInfo.setUpdatedBy(Constants.ADMIN);
         repo.save(organisationInfo);
         return modelMapper.map(organisationInfo, OrganisationDto.class);
     }
@@ -146,5 +169,10 @@ public class OrganisationService {
     public OrganisationDto updateEmployeeCache(Integer organisationId, Long departmentId) {
         Optional<Organisation> organisation = organisationRepo.findById(organisationId);
         return modelMapper.map(organisation.get(), OrganisationDto.class);
+    }
+
+    public OrganisationInfoDto getOrganisationInfo(Integer organisationId) {
+        Optional<Organisation> organisation = organisationRepo.findById(organisationId);
+        return modelMapper.map(organisation.get(), OrganisationInfoDto.class);
     }
 }

@@ -18,9 +18,9 @@ public class CustomUserDetailsService implements UserDetailsService {
     private AuthService authService;
 
     @Override
-    public UserDetails loadUserByUsername(String firstname) throws UsernameNotFoundException {
+    public UserDetails loadUserByUsername(String employeeId) throws UsernameNotFoundException {
 
-        return authService.loadByFirstname(firstname);
+        return authService.loadByFirstname(employeeId);
     }
 
 }
