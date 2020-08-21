@@ -101,7 +101,7 @@ public class EmployeeController {
 
     }
 
-    @GetMapping(value = "/{employeeId}/details")
+    @GetMapping(value = "/{employeeId}")
     public ServiceResponse<BaseMessageResponse<EmployeeDto>> getEmployeeDetails(@PathVariable @NonNull Long employeeId)
             throws NotFoundException, RequestRejectedException {
         log.info("EmployeeController : getEmployeeDetails  : Received Request to get Employee Details :{}", employeeId);
