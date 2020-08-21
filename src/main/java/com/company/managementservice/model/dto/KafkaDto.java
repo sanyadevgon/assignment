@@ -16,8 +16,6 @@ import java.io.Serializable;
 @NoArgsConstructor
 public class KafkaDto implements Serializable {
 
-
-    //@NotBlank(message = "Please provide a name")
     @JsonProperty("firstName")
     private String firstName;
 
@@ -28,6 +26,24 @@ public class KafkaDto implements Serializable {
     @JsonProperty("designation")
     private DesignationType designationType;
 
+    @Min(value = 18)
+    @Max(value = 65)
+    @JsonProperty("age")
+    private Integer age;
+
+    @NotBlank(message = "Please provide an email")
+    @Pattern(regexp = "^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$")
+    @JsonProperty("emailId")
+    private String emailId;
+
+    @NotBlank(message = "Please provide an address")
+    @JsonProperty("address")
+    private String address;
+
+    @Size(min = 10, max = 10)
+    @Pattern(regexp = "^[1-9][0-9]*${9}")
+    @JsonProperty("phone")
+    private String phone;
 
     private Long id;
 
@@ -35,10 +51,8 @@ public class KafkaDto implements Serializable {
     @JsonProperty("amount")
     private Integer amount;
 
-    @Enumerated
     @JsonProperty("currency")
     private String currency;
-
 
 
 }

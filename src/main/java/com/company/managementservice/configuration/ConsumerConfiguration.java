@@ -7,6 +7,7 @@ import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.annotation.EnableKafka;
@@ -30,13 +31,21 @@ public class ConsumerConfiguration {
 
     Logger logger = LoggerFactory.getLogger(ConsumerConfiguration.class);
 
+    @Value(value = "${kafka.bootstrapAddress}")
+    private String bootstrapAddress;
+
+    @Value(value = "${kafka.group}")
+    private String group;
+
+
     @Bean
     public ConsumerFactory<String, KafkaDto> consumerFactory() {
         Map<String, Object> map = new HashMap<>();
-        map.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "127.0.0.1:9092");
+        map.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapAddress);
         map.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         map.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonSerializer.class);
-        map.put(ConsumerConfig.GROUP_ID_CONFIG, "group_id");
+        map.put(ConsumerConfig.GROUP_ID_CONFIG, group);
+        map.put(ConsumerConfig.GROUP_INSTANCE_ID_CONFIG,"a");
         ErrorHandlingDeserializer<KafkaDto> errorHandlingDeserializer =
                 new ErrorHandlingDeserializer<>(new JsonDeserializer<>(KafkaDto.class));
 

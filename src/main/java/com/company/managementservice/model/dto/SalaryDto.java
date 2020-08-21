@@ -1,6 +1,8 @@
 package com.company.managementservice.model.dto;
 
 import com.company.managementservice.model.enums.CurrencyType;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -24,10 +26,13 @@ public class SalaryDto implements Serializable {
     @JsonProperty("currency")
     private String currency;
 
+    @JsonFormat(pattern = "yyyy-MM-dd ")
     @JsonProperty("from_date")
     private LocalDate fromDate = LocalDate.now();
 
+    @JsonFormat(pattern = "yyyy-MM-dd")
     @JsonProperty("to_date")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private LocalDate toDate;
 
 }

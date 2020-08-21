@@ -32,8 +32,9 @@ public class DepartmentController {
     private DepartmentService departmentService;
 
     @PostMapping
-    public ServiceResponse<BaseMessageResponse<DepartmentDto>> saveDepartmentDetails(@Valid @RequestBody DepartmentDto departmentDto,
-                                                    BindingResult bindingResult)
+    public ServiceResponse<BaseMessageResponse<DepartmentDto>> saveDepartmentDetails(
+            @Valid @RequestBody DepartmentDto departmentDto,
+            BindingResult bindingResult)
             throws MethodArgumentNotValidException {
         log.info(
                 "DepartmentController : saveDepartmentDetails : Received Request to save department Details" +
@@ -61,9 +62,10 @@ public class DepartmentController {
     }
 
     @PutMapping("/{id}/update-details")
-    public ServiceResponse<BaseMessageResponse<DepartmentDto>> updateDepartmentDetails(@Valid @RequestBody DepartmentDto departmentDto,
-                                                      BindingResult bindingResult,
-                                                      @PathVariable @NotNull Long id)
+    public ServiceResponse<BaseMessageResponse<DepartmentDto>> updateDepartmentDetails(
+            @Valid @RequestBody DepartmentDto departmentDto,
+            BindingResult bindingResult,
+            @PathVariable @NotNull Long id)
             throws NotFoundException, MethodArgumentNotValidException, RequestRejectedException {
         log.info("DepartmentController : putDepartmentDetails : Received Request to put Department Details for id:{}",
                  id);
@@ -80,8 +82,9 @@ public class DepartmentController {
     }
 
     @PutMapping(value = "/{departmentId}/assign-organisation/{organisationId}")
-    public ServiceResponse<BaseMessageResponse<OrganisationDto>> assignDepartmentToOrganisation(@NotNull @PathVariable Long departmentId,
-                                                                                                @NotNull @PathVariable Integer organisationId
+    public ServiceResponse<BaseMessageResponse<OrganisationDto>> assignDepartmentToOrganisation(
+            @NotNull @PathVariable Long departmentId,
+            @NotNull @PathVariable Integer organisationId
     )
             throws NotFoundException, RequestRejectedException {
         log.info(

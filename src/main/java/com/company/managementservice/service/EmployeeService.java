@@ -182,6 +182,7 @@ EmployeeService {
         employeeInfo.setCreatedBy(employee.get().getCreatedBy());
         employeeInfo.setHireDate(employee.get().getHireDate());
         employeeInfo.setSalaries(employee.get().getSalaries());
+        employeeInfo.setAge(employee.get().getAge());
         employeeRepo.save(employeeInfo);
         cacheService.getEmployeeDepartmentId(employeeId);
         return modelMapper.map(employeeInfo, EmployeeDto.class);

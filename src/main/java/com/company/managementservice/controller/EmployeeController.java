@@ -86,7 +86,7 @@ public class EmployeeController {
     }
 
     @DeleteMapping(value = "/{employeeId}/remove-from-department/{departmentId}")
-    public ServiceResponse<?> removeEmployeeFromDepartment(@NonNull @PathVariable Long departmentId,
+    public ServiceResponse<BaseMessageResponse> removeEmployeeFromDepartment(@NonNull @PathVariable Long departmentId,
                                                            @NonNull @PathVariable Long employeeId
     )
             throws NotFoundException, RequestRejectedException {
@@ -112,7 +112,7 @@ public class EmployeeController {
     }
 
     @PutMapping("/{employeeId}/update-details")
-    public ServiceResponse<?> updateEmployeeDetails(@Valid @RequestBody EmployeeDto employeeDto,
+    public ServiceResponse<BaseMessageResponse<EmployeeDto>> updateEmployeeDetails(@Valid @RequestBody EmployeeDto employeeDto,
                                                     BindingResult bindingResult, @NonNull @PathVariable Long employeeId)
             throws NotFoundException, MethodArgumentNotValidException, RequestRejectedException {
         log.info("EmployeeController : putEmployeeDetails : Received Request to put Employee Details :{}", employeeId);
@@ -130,7 +130,7 @@ public class EmployeeController {
     }
 
     @DeleteMapping("/{employeeId}/terminate")
-    public ServiceResponse<?> removeAEmployee(@NonNull @PathVariable Long employeeId)
+    public ServiceResponse<BaseMessageResponse> removeAEmployee(@NonNull @PathVariable Long employeeId)
             throws NotFoundException, RequestRejectedException {
         log.info("EmployeeController : removeAEmployee: Received Request to remove Employee  :{}", employeeId);
         employeeService.removeEmployee(employeeId);

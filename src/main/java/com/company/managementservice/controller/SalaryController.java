@@ -1,7 +1,9 @@
 package com.company.managementservice.controller;
 
+import com.company.managementservice.constant.Constants;
 import com.company.managementservice.exception.ConstraintViolationException;
 import com.company.managementservice.exception.EmptyBodyException;
+import com.company.managementservice.exception.MethodArgumentNotValidException;
 import com.company.managementservice.exception.NotFoundException;
 import com.company.managementservice.model.dto.KafkaDto;
 import com.company.managementservice.model.dto.SalaryDto;
@@ -11,6 +13,7 @@ import com.company.managementservice.service.SalaryService;
 import lombok.NonNull;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -30,12 +33,11 @@ public class SalaryController {
     @Autowired
     private SalaryService salaryService;
 
+
     @PostMapping(value = "/{id}")
     public ServiceResponse<BaseMessageResponse<SalaryDto>> saveSalaryDetails(@NonNull @PathVariable Long id,
                                                                              @Valid @RequestBody SalaryDto salaryDto)
-            throws NotFoundException, ConstraintViolationException {
-        if (salaryDto.getCurrency() != "RUPEES")
-            throw new ConstraintViolationException("Provide valid currency as RUPEES");
+            throws NotFoundException {
         log.info(
                 "SalaryController : postSalaryDetails : Received Request to post Salary Details " +
                 salaryDto.toString());
@@ -58,8 +60,6 @@ public class SalaryController {
     public ServiceResponse<BaseMessageResponse<SalaryDto>> updateEmployeeSalary(@Valid @RequestBody SalaryDto salaryDto,
                                                                                 @NonNull @PathVariable Long employeeId)
             throws NotFoundException, ConstraintViolationException {
-        if (salaryDto.getCurrency() != "RUPEES")
-            throw new ConstraintViolationException("Provide valid currency as RUPEES");
         log.info("SalaryController : updateSalaryDetails : Received Request to update Salary Details   :{}",
                  employeeId);
         return new ServiceResponse<>(
@@ -77,11 +77,11 @@ public class SalaryController {
 
     }
 
-    @PutMapping(value = "/absolute/{increment}/update-by-department/{departmentId}")
-    public ResponseEntity<BaseMessageResponse> updateSalaryByDepartmentAbsolute(@PathVariable Long increment,
-                                                                                @PathVariable Long departmentId)
-            throws EmptyBodyException, NotFoundException {
-        salaryService.updateSalaryByDepartment(increment, departmentId);
+    @PutMapping(value = "/absolute/{increment}/{currency}/update-by-department/{departmentId}")
+    public ResponseEntity<BaseMessageResponse> updateSalaryByDepartmentAbsolute(@PathVariable Long increment, @PathVariable String currency,
+                                                                                @NonNull @PathVariable Long departmentId)
+            throws MethodArgumentNotValidException, NotFoundException {
+        salaryService.updateSalaryByDepartment(increment,currency, departmentId);
         return new ServiceResponse<BaseMessageResponse>(
                 new BaseMessageResponse(
                         "Salary Updated Successfully ",
@@ -90,8 +90,8 @@ public class SalaryController {
 
     @PutMapping(value = "/percent/{percentage}/update-by-department/{departmentId}")
     public ResponseEntity<BaseMessageResponse> updateSalaryByDepartmentPercentage(@PathVariable Long percentage,
-                                                                                  @PathVariable Long departmentId)
-            throws EmptyBodyException, NotFoundException {
+                                                                                  @NonNull @PathVariable Long departmentId)
+            throws NotFoundException, MethodArgumentNotValidException {
         salaryService.updateSalaryByDepartmentPercentage(percentage, departmentId);
         return new ServiceResponse<BaseMessageResponse>(
                 new BaseMessageResponse(
@@ -99,11 +99,11 @@ public class SalaryController {
                         HttpStatus.OK, true));
     }
 
-    @PutMapping(value = "/absolute/{increment}/update-by-organisation/{organisationId}")
-    public ResponseEntity<BaseMessageResponse> updateSalaryByOrganisationAbsolute(@PathVariable Long increment,
-                                                                                  @PathVariable Integer organisationId)
-            throws EmptyBodyException, NotFoundException {
-        salaryService.updateSalaryByOrganisation(increment, organisationId);
+    @PutMapping(value = "/absolute/{increment}/{currency}/update-by-organisation/{organisationId}")
+    public ResponseEntity<BaseMessageResponse> updateSalaryByOrganisationAbsolute(@PathVariable Long increment,@PathVariable String currency,
+                                                                                  @NonNull @PathVariable Integer organisationId)
+            throws  NotFoundException, MethodArgumentNotValidException {
+        salaryService.updateSalaryByOrganisation(increment, currency,organisationId);
         return new ServiceResponse<BaseMessageResponse>(
                 new BaseMessageResponse(
                         "Salary Updated Successfully ",
@@ -112,9 +112,9 @@ public class SalaryController {
 
     @PutMapping(value = "/percent/{percentage}/update-by-organisation/{organisationId}")
     public ResponseEntity<BaseMessageResponse> updateSalaryByOrganisationPercentage(@PathVariable Long percentage,
-                                                                                    @PathVariable
+                                                                                    @NonNull @PathVariable
                                                                                             Integer organisationId)
-            throws NotFoundException, EmptyBodyException {
+            throws NotFoundException, MethodArgumentNotValidException {
         salaryService.updateSalaryByOrganisationPercentage(percentage, organisationId);
         return new ServiceResponse<BaseMessageResponse>(
                 new BaseMessageResponse(
@@ -122,10 +122,11 @@ public class SalaryController {
                         HttpStatus.OK, true));
     }
 
-    @KafkaListener(topics = "salary", groupId = "group_id",
+    @KafkaListener(topics = Constants.TOPIC, groupId = Constants.GROUP_ID,
                    containerFactory = "concurrentKafkaListenerContainerFactory")
-    public void updateSalaryKafka(@Valid @RequestBody KafkaDto kafkaDto) throws NotFoundException, EmptyBodyException {
-        log.info("Received through kafka", kafkaDto.getFirstName());
+    public void updateSalaryKafka(@Valid @RequestBody KafkaDto kafkaDto)
+            throws NotFoundException, EmptyBodyException, ConstraintViolationException {
+        log.info("Received through kafka{}",kafkaDto);
         salaryService.updateSalaryThroughKafka(kafkaDto);
     }
 
