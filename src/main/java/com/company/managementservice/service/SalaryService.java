@@ -22,7 +22,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -70,7 +69,7 @@ public class SalaryService {
         salaryRepo.save(salary);
         employee.get().setSalaries(salaries);
         employeeRepo.save(employee.get());
-        return modelMapper.map(salary,SalaryDto.class);
+        return modelMapper.map(salary, SalaryDto.class);
     }
 
     public List<SalaryDto> getEmployeeSalary(Long id) throws NotFoundException {
@@ -109,7 +108,7 @@ public class SalaryService {
         employee.get().setSalaries(salaries);
         salaryRepo.save(salary);
         employeeRepo.save(employee.get());
-        return modelMapper.map(salary,SalaryDto.class);
+        return modelMapper.map(salary, SalaryDto.class);
 
     }
 
@@ -198,9 +197,11 @@ public class SalaryService {
     @Transactional
     public void updateSalaryThroughKafka(KafkaDto kafkaDto) throws NotFoundException, EmptyBodyException {
         Long employeeId = kafkaDto.getId();
-        if (employeeId==null) {
-            if(kafkaDto.getFirstName()==null){
-                throw new EmptyBodyException("Please provide firstName");
+        if (employeeId == null) {
+            if (kafkaDto.getFirstName() == null || kafkaDto.getPhone() == null || kafkaDto.getAddress() == null ||
+                kafkaDto.getDesignationType() == null || kafkaDto.getAmount() == null) {
+                log.info("Please provide firstName,phone,address designation and amount");
+                throw new EmptyBodyException("Please provide firstName,phone, address, designation and amount");
             }
             Employee employee1 = new Employee();
             employee1.setFirstName(kafkaDto.getFirstName());
@@ -210,7 +211,6 @@ public class SalaryService {
             employee1.setPhone(kafkaDto.getPhone());
             employee1.setAge(kafkaDto.getAge());
             employee1.setAddress(kafkaDto.getAddress());
-            employee1.setEmailId(kafkaDto.getEmailId());
             Long salaryInRuppe =
                     currencyConvertorService.getRupeeValue(Long.valueOf(kafkaDto.getAmount()), kafkaDto.getCurrency());
             Salary salary = new Salary();
@@ -223,10 +223,12 @@ public class SalaryService {
             employeeRepo.save(employee1);
         } else {
             Optional<Employee> employee = employeeRepo.findById(employeeId);
-            if(!employee.isPresent())
+            if (!employee.isPresent())
                 throw new NotFoundException("Employee not found");
             if (employee.get().getTerminatedDate() != null)
                 throw new NotFoundException("Employee is terminated, salary cant be updated");
+            if(kafkaDto.getAmount()==null)
+                throw new EmptyBodyException("Please provide amount");
             Set<Salary> salaries = employee.get().getSalaries();
             log.info("salaryService: updateSalaryThroughKafka: Kafka update the salary of employee in db :{}",
                      employeeId);

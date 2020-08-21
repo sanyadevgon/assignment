@@ -31,12 +31,11 @@ public class KafkaDto implements Serializable {
     @JsonProperty("age")
     private Integer age;
 
-    @NotBlank(message = "Please provide an email")
+
     @Pattern(regexp = "^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$")
     @JsonProperty("emailId")
     private String emailId;
 
-    @NotBlank(message = "Please provide an address")
     @JsonProperty("address")
     private String address;
 
@@ -45,6 +44,7 @@ public class KafkaDto implements Serializable {
     @JsonProperty("phone")
     private String phone;
 
+    @JsonProperty("id")
     private Long id;
 
     @Min(value=0)

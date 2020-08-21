@@ -12,7 +12,4 @@ import java.util.Optional;
 public interface OrganisationRepo extends JpaRepository<Organisation, Integer> {
     Optional<Department> findById(Long organisationId);
 
-    // @Query(value="select d from department d inner join organisation o on d.id=o.id ")
-
-
 }
