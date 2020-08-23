@@ -25,7 +25,7 @@ public abstract class AbstractEntity<T> {
 
 
     @JsonIgnore
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = Constants.TIMESTAMP)
     private LocalDateTime createdAt;
 
     @JsonIgnore

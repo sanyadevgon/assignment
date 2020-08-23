@@ -53,8 +53,8 @@ public class CustomExceptionHandler {
                 HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(value = ConstraintViolationException.class)
-    public ServiceResponse<?> constraintViolationException(ConstraintViolationException ex) {
+    @ExceptionHandler(value = javax.validation.ConstraintViolationException.class)
+    public ServiceResponse<?> constraintViolationException(javax.validation.ConstraintViolationException ex) {
         log.info("Unable to complete request. Exception occurred: {}", ex.getMessage());
         return new ServiceResponse<BaseMessageResponse>(
                 new BaseMessageResponse<>(ex.getMessage().toString(), HttpStatus.BAD_REQUEST, false),
@@ -77,6 +77,9 @@ public class CustomExceptionHandler {
                 new BaseMessageResponse<>(ex.getMessage().toString(), HttpStatus.BAD_REQUEST, false),
                 HttpStatus.BAD_REQUEST);
     }
+
+
+
 
 }
 

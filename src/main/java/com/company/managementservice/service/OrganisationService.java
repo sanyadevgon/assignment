@@ -171,8 +171,10 @@ public class OrganisationService {
         return modelMapper.map(organisation.get(), OrganisationDto.class);
     }
 
-    public OrganisationInfoDto getOrganisationInfo(Integer organisationId) {
+    public OrganisationInfoDto getOrganisationInfo(Integer organisationId) throws NotFoundException {
         Optional<Organisation> organisation = organisationRepo.findById(organisationId);
+        if(!organisation.isPresent())
+            throw new NotFoundException("Organisation not found");
         return modelMapper.map(organisation.get(), OrganisationInfoDto.class);
     }
 }

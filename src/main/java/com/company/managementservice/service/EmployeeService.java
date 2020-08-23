@@ -202,7 +202,7 @@ EmployeeService {
         Set<Salary> salaries = employee.get().getSalaries();
         for (Salary salary: salaries) {
             if (salary.getToDate() == null) {
-                salary.setToDate(LocalDate.now());
+                salary.setToDate(LocalDateTime.now());
                 salaryRepo.save(salary);
             }
         }

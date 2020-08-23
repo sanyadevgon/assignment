@@ -1,6 +1,7 @@
 package com.company.managementservice.model.dto;
 
 
+import com.company.managementservice.constant.Constants;
 import com.company.managementservice.model.enums.DesignationType;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
@@ -32,7 +33,7 @@ public class KafkaDto implements Serializable {
     private Integer age;
 
 
-    @Pattern(regexp = "^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$")
+    @Pattern(regexp = Constants.EMAIL)
     @JsonProperty("emailId")
     private String emailId;
 
@@ -40,7 +41,7 @@ public class KafkaDto implements Serializable {
     private String address;
 
     @Size(min = 10, max = 10)
-    @Pattern(regexp = "^[1-9][0-9]*${9}")
+    @Pattern(regexp = Constants.PHONE)
     @JsonProperty("phone")
     private String phone;
 

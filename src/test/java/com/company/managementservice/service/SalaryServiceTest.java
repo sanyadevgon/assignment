@@ -1,12 +1,12 @@
 package com.company.managementservice.service;
 
-import com.company.managementservice.exception.EmptyBodyException;
 import com.company.managementservice.exception.MethodArgumentNotValidException;
 import com.company.managementservice.exception.NotFoundException;
 import com.company.managementservice.model.dto.SalaryDto;
 import com.company.managementservice.model.entity.Department;
 import com.company.managementservice.model.entity.Employee;
 import com.company.managementservice.model.entity.Salary;
+import com.company.managementservice.model.enums.CurrencyType;
 import com.company.managementservice.repo.DepartmentRepo;
 import com.company.managementservice.repo.EmployeeRepo;
 import com.company.managementservice.repo.OrganisationRepo;
@@ -15,43 +15,43 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
-import org.springframework.test.context.junit4.SpringRunner;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
 import static org.mockito.ArgumentMatchers.any;
 
-@RunWith(SpringRunner.class)
+@RunWith(MockitoJUnitRunner.class)
 public class SalaryServiceTest {
 
-    @Autowired
+    @InjectMocks
     SalaryService salaryService;
 
-    @MockBean
+    @Mock
     private SalaryRepo salaryRepo;
 
-    @MockBean
+    @Mock
     private EmployeeRepo employeeRepo;
 
-    @MockBean
+    @Mock
     private DepartmentRepo departmentRepo;
 
-    @MockBean
+    @Mock
     private OrganisationRepo organisationRepo;
 
-    @MockBean
+    @Mock
     private CacheService cacheService;
 
-    @MockBean
+    @Mock
     private CurrencyConvertorService currencyConvertorService;
 
     @Before
@@ -68,11 +68,11 @@ public class SalaryServiceTest {
     }
 
     @Test
-    public void getEmployeeCurrentSalary() throws NotFoundException {
+    public void getEmployeeCurrentSalary_shouldReturnAmountAsPassed_success() throws NotFoundException {
 
         Employee employee = new Employee();
-        Salary salary1 = new Salary(100, "RUPEES", LocalDate.now(), LocalDate.now());
-        Salary salary2 = new Salary(1000, "RUPEES", LocalDate.now(), null);
+        Salary salary1 = new Salary(100, CurrencyType.RUPEES, LocalDateTime.now(), LocalDateTime.now());
+        Salary salary2 = new Salary(1000, CurrencyType.RUPEES, LocalDateTime.now(), null);
 
         Set salaries = new HashSet<Salary>();
         salaries.add(salary1);
@@ -86,9 +86,8 @@ public class SalaryServiceTest {
         Assertions.assertEquals(Long.valueOf(current.getAmount()), 1000L);
     }
 
-
     @Test(expected = NotFoundException.class)
-    public void getEmployeeCurrentSalaryShouldTHrowException() throws NotFoundException {
+    public void getEmployeeCurrentSalary_ShouldThrowExceptionWhenEmployeeIdNotFound_() throws NotFoundException {
 
         Employee employee = new Employee();
         Set salaries = new HashSet<Salary>();
@@ -101,42 +100,44 @@ public class SalaryServiceTest {
     }
 
     @Test(expected = MethodArgumentNotValidException.class)
-    public void updateSalaryByDepartmentShouldThrowExceptionForNullInc() throws NotFoundException, MethodArgumentNotValidException{
+    public void updateSalaryByDepartment_ShouldThrowExceptionForNullIncrement()
+            throws NotFoundException, MethodArgumentNotValidException {
         salaryService.updateSalaryByDepartment(null, "rupees", 14L);
     }
 
     @Test(expected = MethodArgumentNotValidException.class)
-    public void updateSalaryByDepartmentShouldThrowException() throws NotFoundException, MethodArgumentNotValidException {
+    public void updateSalaryByDepartment_ShouldThrowExceptionForNegavtiveIncrement()
+            throws NotFoundException, MethodArgumentNotValidException {
         salaryService.updateSalaryByDepartment(-7L, "rupees", 14L);
     }
 
     @Test(expected = NotFoundException.class)
-    public void updateSalaryByDepartmentShouldThrowExceptionC() throws NotFoundException, MethodArgumentNotValidException {
+    public void updateSalaryByDepartment_ShouldThrowExceptionForInValidCurrencyType()
+            throws NotFoundException, MethodArgumentNotValidException {
         Department department = new Department();
-        Mockito.when(departmentRepo.findById(14L)).thenReturn(Optional.of(department));
-        Mockito.when(currencyConvertorService.getRupeeValue(any(),any())).thenCallRealMethod();
+        Mockito
+                .when(departmentRepo.findById(14L)).thenReturn(Optional.of(department));
+        Mockito.when(currencyConvertorService.getRupeeValue(any(), any())).thenCallRealMethod();
 
         salaryService.updateSalaryByDepartment(7L, "rups", 14L);
     }
 
     @Test(expected = MethodArgumentNotValidException.class)
-    public void updateSalaryByDepartmentPercentageShouldThrowExceptionForNegative() throws NotFoundException, MethodArgumentNotValidException {
-        salaryService.updateSalaryByDepartmentPercentage(-101L,14L);
+    public void updateSalaryByDepartmentPercentage_ShouldThrowExceptionFor1stParamLessThanNegative100()
+            throws NotFoundException, MethodArgumentNotValidException {
+        salaryService.updateSalaryByDepartmentPercentage(-101L, 14L);
     }
 
     @Test(expected = MethodArgumentNotValidException.class)
-    public void updateSalaryByDepartmentPercentageShouldThrowExceptionForZero() throws NotFoundException, MethodArgumentNotValidException {
-        salaryService.updateSalaryByDepartmentPercentage(0L,14L);
+    public void updateSalaryByDepartmentPercentage_ShouldThrowExceptionFor1stParamWhenZero()
+            throws NotFoundException, MethodArgumentNotValidException {
+        salaryService.updateSalaryByDepartmentPercentage(0L, 14L);
     }
 
     @Test(expected = MethodArgumentNotValidException.class)
-    public void updateSalaryByDepartmentPercentageShouldThrowExceptionForHighPercent() throws NotFoundException, MethodArgumentNotValidException {
-        salaryService.updateSalaryByDepartmentPercentage(101L,14L);
-    }
-
-    @Test(expected = MethodArgumentNotValidException.class)
-    public void updateSalaryByDepartmentPercentageShouldThrowExceptionForNull() throws NotFoundException, MethodArgumentNotValidException {
-        salaryService.updateSalaryByDepartmentPercentage(null,14L);
+    public void updateSalaryByDepartmentPercentage_ShouldThrowExceptionFor1stParamWhenNull()
+            throws NotFoundException, MethodArgumentNotValidException {
+        salaryService.updateSalaryByDepartmentPercentage(null, 14L);
     }
 
     @Test

@@ -129,7 +129,7 @@ public class EmployeeController {
                         HttpStatus.OK, true));
     }
 
-    @DeleteMapping("/{employeeId}/terminate")
+    @DeleteMapping("/{employeeId}")
     public ServiceResponse<BaseMessageResponse> removeAEmployee(@NonNull @PathVariable Long employeeId)
             throws NotFoundException, RequestRejectedException {
         log.info("EmployeeController : removeAEmployee: Received Request to remove Employee  :{}", employeeId);

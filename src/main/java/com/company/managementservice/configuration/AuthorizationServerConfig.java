@@ -1,5 +1,6 @@
 package com.company.managementservice.configuration;
 
+import com.company.managementservice.constant.Constants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -35,7 +36,7 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
                 .authorities("ROLE_CLIENT", "ROLE_TRUSTED_CLIENT")
                 .scopes("read", "write", "trust")
                 .resourceIds("oauth2-resource")
-                .accessTokenValiditySeconds(3000)
+                .accessTokenValiditySeconds(Constants.EXPIRATION_TIME)//constants
                 .secret(passwordEncoder.encode("secret"));
     }
 

@@ -7,10 +7,10 @@ public enum CurrencyType {
     EURO(100L),
     RUPEES(1L);
 
-    public final Long Rupeevalue;
+    public final Long rupeeValue;
 
     CurrencyType(Long value){
-        this.Rupeevalue=value;
+        this.rupeeValue=value;
 
     }
 

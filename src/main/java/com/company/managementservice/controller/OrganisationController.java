@@ -101,7 +101,7 @@ public class OrganisationController {
                         HttpStatus.OK, true));
     }
 
-    @DeleteMapping("/{id}/remove-organisation")
+    @DeleteMapping("/{id}")
     public ResponseEntity<BaseMessageResponse> removeOrganisation(@NonNull @PathVariable Integer id)
             throws NotFoundException {
         log.info(
