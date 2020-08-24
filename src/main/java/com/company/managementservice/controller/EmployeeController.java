@@ -58,7 +58,6 @@ public class EmployeeController {
                                                                                         @NonNull @PathVariable Integer organisationId
     )
             throws NotFoundException, RequestRejectedException, EmptyBodyException {
-
         log.info(
                 "EmployeeController : assignEmployeeToDepartment : Received Request to assign Department To Employee:{} :{}"
                 , departmentId, employeeId);
