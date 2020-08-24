@@ -83,7 +83,7 @@ public class SalaryServiceTest {
     }
 
     @Test(expected = NotFoundException.class)
-    public void getEmployeeCurrentSalary_ShouldThrowExceptionWhenEmployeeIdNotFound() throws NotFoundException {
+    public void getEmployeeCurrentSalary_shouldThrowExceptionWhenEmployeeIdNotFound() throws NotFoundException {
 
         Employee employee = new Employee();
         Set salaries = new HashSet<Salary>();
@@ -96,25 +96,25 @@ public class SalaryServiceTest {
     }
 
     @Test(expected = MethodArgumentNotValidException.class)
-    public void updateSalaryByDepartment_ShouldThrowExceptionFor1stParamIncremenAsNull()
+    public void updateSalaryByDepartment_shouldThrowExceptionFor1stParamIncrementWhenNull()
             throws NotFoundException, MethodArgumentNotValidException {
         salaryService.updateSalaryByDepartment(null, "rupees", 14L);
     }
 
     @Test(expected = MethodArgumentNotValidException.class)
-    public void updateSalaryByDepartment_ShouldThrowExceptionFor1stParamIncremenWhenZero()
+    public void updateSalaryByDepartment_shouldThrowExceptionFor1stParamIncrementWhenZero()
             throws NotFoundException, MethodArgumentNotValidException {
         salaryService.updateSalaryByDepartment(0L, "rupees", 14L);
     }
 
     @Test(expected = MethodArgumentNotValidException.class)
-    public void updateSalaryByDepartment_ShouldThrowExceptionFor1stParamIncrementWhenNegative()
+    public void updateSalaryByDepartment_shouldThrowExceptionFor1stParamIncrementWhenNegative()
             throws NotFoundException, MethodArgumentNotValidException {
         salaryService.updateSalaryByDepartment(-7L, "rupees", 14L);
     }
 
     @Test(expected = NotFoundException.class)
-    public void updateSalaryByDepartment_ShouldThrowExceptionFor2ndParamCurrencyTypeWhenInValid()
+    public void updateSalaryByDepartment_shouldThrowExceptionFor2ndParamCurrencyTypeWhenInValid()
             throws NotFoundException, MethodArgumentNotValidException {
         Department department = new Department();
         Mockito
@@ -125,25 +125,25 @@ public class SalaryServiceTest {
     }
 
     @Test(expected = MethodArgumentNotValidException.class)
-    public void updateSalaryByDepartmentPercentage_ShouldThrowExceptionFor1stParamPercentageLessThanNegative100()
+    public void updateSalaryByDepartmentPercentage_shouldThrowExceptionFor1stParamPercentageLessThanNegative100()
             throws NotFoundException, MethodArgumentNotValidException {
         salaryService.updateSalaryByDepartmentPercentage(-101L, 14L);
     }
 
     @Test(expected = MethodArgumentNotValidException.class)
-    public void updateSalaryByDepartmentPercentage_ShouldThrowExceptionFor1stParamPercentageWhenZero()
+    public void updateSalaryByDepartmentPercentage_shouldThrowExceptionFor1stParamPercentageWhenZero()
             throws NotFoundException, MethodArgumentNotValidException {
         salaryService.updateSalaryByDepartmentPercentage(0L, 14L);
     }
 
     @Test(expected = MethodArgumentNotValidException.class)
-    public void updateSalaryByDepartmentPercentage_ShouldThrowExceptionFor1stParamPercentageWhenNull()
+    public void updateSalaryByDepartmentPercentage_shouldThrowExceptionFor1stParamPercentageWhenNull()
             throws NotFoundException, MethodArgumentNotValidException {
         salaryService.updateSalaryByDepartmentPercentage(null, 14L);
     }
 
     @Test
-    public void saveSalary() throws NotFoundException {
+    public void saveSalaryForEmployee_success() throws NotFoundException {
         Employee employee = new Employee();
         employee.setSalaries(new HashSet<Salary>());
         SalaryDto salaryDto = new SalaryDto();
