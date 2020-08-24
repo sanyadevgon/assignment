@@ -1,17 +1,11 @@
 package com.company.managementservice.model.enums;
 
-import com.company.managementservice.exception.NotFoundException;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.core.JsonParseException;
-import com.oracle.javafx.jmx.json.JSONException;
-
-import java.io.IOException;
 
 public enum IncrementType {
-    ABSOLUTE("absolute"),
-    PERCENTAGE("percentage");
+    ABSOLUTE,
+    PERCENTAGE;
 
-    private String key;
+    /*private String key;
 
     IncrementType(String key) {
         this.key = key;
@@ -27,5 +21,5 @@ public enum IncrementType {
             throw new NotFoundException("Increment type not found ");
         }
 
-    }
+    }*/
 }

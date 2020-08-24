@@ -58,8 +58,7 @@ public class EmployeeController {
                                                                                         @NonNull @PathVariable Integer organisationId
     )
             throws NotFoundException, RequestRejectedException, EmptyBodyException {
-        if (employeeId == 0 || Objects.isNull(employeeId))
-            throw new EmptyBodyException("invalid id for employee ");
+
         log.info(
                 "EmployeeController : assignEmployeeToDepartment : Received Request to assign Department To Employee:{} :{}"
                 , departmentId, employeeId);
