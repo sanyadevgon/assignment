@@ -21,18 +21,18 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.Objects;
+
 
 @Log4j2
 @RestController
 @Validated
-@RequestMapping(value = "/employee", consumes = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping( consumes = MediaType.APPLICATION_JSON_VALUE)
 public class EmployeeController {
 
     @Autowired
     private EmployeeService employeeService;
 
-    @PostMapping
+    @PostMapping(value = "/employee")
     public ServiceResponse<BaseMessageResponse<EmployeeDto>> saveEmployeeDetails(@Valid @RequestBody EmployeeDto employeeDto,
                                                   BindingResult bindingResult)
             throws MethodArgumentNotValidException {
@@ -52,7 +52,7 @@ public class EmployeeController {
 
     }
 
-    @PutMapping(value = "/{employeeId}/assign-department/{departmentId}/in-organisation/{organisationId}")
+    @PutMapping(value = "/organisation/{organisationId}/assign-department/{departmentId}/{employeeId}")
     public ServiceResponse<BaseMessageResponse<DepartmentDto>> assignEmployeeDepartment(@NonNull @PathVariable Long employeeId,
                                                                                         @NonNull @PathVariable Long departmentId,
                                                                                         @NonNull @PathVariable Integer organisationId
@@ -68,7 +68,7 @@ public class EmployeeController {
 
     }
 
-    @PutMapping(value = "/{employeeId}/freelance/organisation/{organisationId}")
+    @PutMapping(value = "/organisation/{organisationId}/freelance/{employeeId}")
     public ServiceResponse<BaseMessageResponse<DepartmentDto>> assignFreelancerEmployeeOrganisation(@NonNull @PathVariable Long employeeId,
                                                                    @NonNull @PathVariable Integer organisationId
     )
@@ -83,7 +83,7 @@ public class EmployeeController {
 
     }
 
-    @DeleteMapping(value = "/{employeeId}/remove-from-department/{departmentId}")
+    @DeleteMapping(value = "/department/{departmentId}/{employeeId}")
     public ServiceResponse<BaseMessageResponse> removeEmployeeFromDepartment(@NonNull @PathVariable Long departmentId,
                                                            @NonNull @PathVariable Long employeeId
     )
@@ -109,7 +109,7 @@ public class EmployeeController {
 
     }
 
-    @PutMapping("/{employeeId}/update-details")
+    @PutMapping(value ="/employee/{employeeId}")
     public ServiceResponse<BaseMessageResponse<EmployeeDto>> updateEmployeeDetails(@Valid @RequestBody EmployeeDto employeeDto,
                                                     BindingResult bindingResult, @NonNull @PathVariable Long employeeId)
             throws NotFoundException, MethodArgumentNotValidException, RequestRejectedException {
@@ -138,7 +138,7 @@ public class EmployeeController {
                         HttpStatus.OK, true));
     }
 
-    @GetMapping("/on-bench-list")
+    @GetMapping("/employee/on-bench-list")
     public ServiceResponse<?> employeeOnBench() {
         log.info("EmployeeController : employeeOnBench: Received Request to list Employee on bench");
         return new ServiceResponse<>(

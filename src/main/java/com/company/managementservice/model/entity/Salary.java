@@ -14,6 +14,7 @@ import java.time.LocalDateTime;
 @Table(name = "salary")
 @Data
 @NoArgsConstructor
+
 @AllArgsConstructor
 public class Salary extends AbstractEntity<Long> implements Serializable {
 

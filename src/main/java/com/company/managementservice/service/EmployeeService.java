@@ -208,7 +208,9 @@ EmployeeService {
         }
         employeeRepo.save(employee.get());
         Long departmentId = employeeRepo.getDepartmentId(employeeId);
-        cacheService.removeEmployeeCache(departmentId, employeeId);
+        if(departmentId!=null) {
+            cacheService.removeEmployeeCache(departmentId, employeeId);
+        }
         employeeRepo.removeEmployee(employeeId);
         authService.removeAuthcache(employee.get());
     }
