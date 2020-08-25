@@ -31,13 +31,13 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
     public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
         clients
                 .inMemory()
-                .withClient("my-trusted-client")
+                .withClient(Constants.CLIENT_ID)
                 .authorizedGrantTypes("client_credentials", "password")
                 .authorities("ROLE_CLIENT", "ROLE_TRUSTED_CLIENT")
                 .scopes("read", "write", "trust")
-                .resourceIds("oauth2-resource")
-                .accessTokenValiditySeconds(Constants.EXPIRATION_TIME)//constants
-                .secret(passwordEncoder.encode("secret"));
+                .resourceIds(Constants.RESOURCE_ID)
+                .accessTokenValiditySeconds(Constants.EXPIRATION_TIME)
+                .secret(passwordEncoder.encode(Constants.SECRET));
     }
 
     @Override
