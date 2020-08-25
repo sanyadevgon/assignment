@@ -1,6 +1,5 @@
 package com.company.managementservice.service;
 
-
 import com.company.managementservice.exception.MethodArgumentNotValidException;
 import com.company.managementservice.exception.NotFoundException;
 import com.company.managementservice.model.dto.SalaryDto;
@@ -12,14 +11,11 @@ import com.company.managementservice.repo.DepartmentRepo;
 import com.company.managementservice.repo.EmployeeRepo;
 import com.company.managementservice.repo.OrganisationRepo;
 import com.company.managementservice.repo.SalaryRepo;
-import org.junit.Before;
 import org.junit.Test;
-import org.junit.jupiter.api.Assertions;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
@@ -29,6 +25,7 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -79,67 +76,125 @@ public class SalaryServiceTest {
         Mockito.when(employeeRepo.findById(1l)).thenReturn(Optional.of(employee));
 
         SalaryDto current = salaryService.getEmployeeCurrentSalary(1L);
-        Assertions.assertEquals(Long.valueOf(current.getAmount()), 1000L);
+        assertEquals(Long.valueOf(current.getAmount()), 1000L);
     }
 
-    @Test(expected = NotFoundException.class)
+    @Test
     public void getEmployeeCurrentSalary_shouldThrowExceptionWhenEmployeeIdNotFound() throws NotFoundException {
 
-        Employee employee = new Employee();
-        Set salaries = new HashSet<Salary>();
-        employee.setSalaries(salaries);
+        try {
+            Employee employee = new Employee();
+            Set salaries = new HashSet<Salary>();
+            employee.setSalaries(salaries);
 
-        Mockito.when(employeeRepo.findById(1l)).thenReturn(Optional.of(employee));
+            Mockito.when(employeeRepo.findById(1l)).thenReturn(Optional.of(employee));
 
-        SalaryDto current = salaryService.getEmployeeCurrentSalary(1L);
-
+            SalaryDto current = salaryService.getEmployeeCurrentSalary(1L);
+        }
+        catch (NotFoundException e){
+            String message="No Salary Details found";
+            assertEquals(message, e.getMessage());
+        }
     }
 
-    @Test(expected = MethodArgumentNotValidException.class)
+    @Test
     public void updateSalaryByDepartment_shouldThrowExceptionFor1stParamIncrementWhenNull()
-            throws NotFoundException, MethodArgumentNotValidException {
-        salaryService.updateSalaryByDepartment(null, "rupees", 14L);
+            throws NotFoundException{
+        try {
+            salaryService.updateSalaryByDepartment(null, "rupees", 14L);
+        }
+        catch (MethodArgumentNotValidException e){
+            String message="invalid data for increment ";
+            assertEquals(message, e.getMessage());
+        }
     }
 
-    @Test(expected = MethodArgumentNotValidException.class)
+    @Test
     public void updateSalaryByDepartment_shouldThrowExceptionFor1stParamIncrementWhenZero()
             throws NotFoundException, MethodArgumentNotValidException {
-        salaryService.updateSalaryByDepartment(0L, "rupees", 14L);
+        try {
+            salaryService.updateSalaryByDepartment(0L, "rupees", 14L);
+        }
+        catch (MethodArgumentNotValidException e){
+            String message="invalid data for increment ";
+            assertEquals(message, e.getMessage());
+        }
     }
 
-    @Test(expected = MethodArgumentNotValidException.class)
+    @Test
     public void updateSalaryByDepartment_shouldThrowExceptionFor1stParamIncrementWhenNegative()
             throws NotFoundException, MethodArgumentNotValidException {
-        salaryService.updateSalaryByDepartment(-7L, "rupees", 14L);
+            try {
+                salaryService.updateSalaryByDepartment(-7L, "rupees", 14L);
+            }
+            catch (MethodArgumentNotValidException e){
+                String message="invalid data for increment ";
+                assertEquals(message, e.getMessage());
+            }
     }
 
-    @Test(expected = NotFoundException.class)
+    @Test
+    public void updateSalaryByDepartment_shouldThrowExceptionFor2ndParamIncrementWhenNull()
+            throws NotFoundException, MethodArgumentNotValidException {
+        try {
+            salaryService.updateSalaryByDepartment(40L, null, 14L);
+        }
+        catch (MethodArgumentNotValidException e){
+            String message="invalid data for increment, provide currency type ";
+            assertEquals(message, e.getMessage());
+        }
+    }
+
+    @Test
     public void updateSalaryByDepartment_shouldThrowExceptionFor2ndParamCurrencyTypeWhenInValid()
-            throws NotFoundException, MethodArgumentNotValidException {
-        Department department = new Department();
-        Mockito
-                .when(departmentRepo.findById(14L)).thenReturn(Optional.of(department));
-        Mockito.when(currencyConvertorService.getRupeeValue(any(), any())).thenCallRealMethod();
+            throws  MethodArgumentNotValidException {
 
-        salaryService.updateSalaryByDepartment(7L, "rups", 14L);
+        try {
+            Department department = new Department();
+            Mockito
+                    .when(departmentRepo.findById(14L)).thenReturn(Optional.of(department));
+            Mockito.when(currencyConvertorService.getRupeeValue(any(), any())).thenCallRealMethod();
+            salaryService.updateSalaryByDepartment(7L, "rups", 14L);
+        } catch (NotFoundException e) {
+            String message = "Currency type not found ";
+            assertEquals(message, e.getMessage());
+        }
     }
 
-    @Test(expected = MethodArgumentNotValidException.class)
+    @Test
     public void updateSalaryByDepartmentPercentage_shouldThrowExceptionFor1stParamPercentageLessThanNegative100()
-            throws NotFoundException, MethodArgumentNotValidException {
-        salaryService.updateSalaryByDepartmentPercentage(-101L, 14L);
+            throws NotFoundException {
+        try {
+            salaryService.updateSalaryByDepartmentPercentage(-101L, 14L);
+        } catch (MethodArgumentNotValidException e) {
+            String message = "Percent not in range :-100 to 0 or greater than 0";
+            assertEquals(message, e.getMessage());
+
+        }
     }
 
-    @Test(expected = MethodArgumentNotValidException.class)
+    @Test
     public void updateSalaryByDepartmentPercentage_shouldThrowExceptionFor1stParamPercentageWhenZero()
-            throws NotFoundException, MethodArgumentNotValidException {
-        salaryService.updateSalaryByDepartmentPercentage(0L, 14L);
+            throws NotFoundException {
+        try {
+            salaryService.updateSalaryByDepartmentPercentage(0L, 14L);
+        } catch (MethodArgumentNotValidException e) {
+            String message = "Percent not in range :-100 to 0 or greater than 0";
+            assertEquals(message, e.getMessage());
+
+        }
     }
 
-    @Test(expected = MethodArgumentNotValidException.class)
+    @Test
     public void updateSalaryByDepartmentPercentage_shouldThrowExceptionFor1stParamPercentageWhenNull()
-            throws NotFoundException, MethodArgumentNotValidException {
-        salaryService.updateSalaryByDepartmentPercentage(null, 14L);
+            throws NotFoundException{
+        try {
+            salaryService.updateSalaryByDepartmentPercentage(null, 14L);
+        } catch (MethodArgumentNotValidException e) {
+            String message = "Percent not in range :-100 to 0 or greater than 0";
+            assertEquals(message, e.getMessage());
+
+        }
     }
 
     @Test
@@ -149,7 +204,7 @@ public class SalaryServiceTest {
         SalaryDto salaryDto = new SalaryDto();
         salaryDto.setAmount(1000);
         salaryDto.setCurrency("EURO");
-        Salary salary=new Salary();
+        Salary salary = new Salary();
         Mockito.when(employeeRepo.findById(any())).thenReturn(Optional.of(employee));
         Mockito.when(currencyConvertorService.getRupeeValue(any(), any())).thenCallRealMethod();
         Mockito.when(salaryRepo.save(any())).thenReturn(salary);

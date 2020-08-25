@@ -157,7 +157,7 @@ public class SalaryService {
     public void updateSalaryByDepartmentPercentage(Long percentage, Long departmentId)
             throws NotFoundException, MethodArgumentNotValidException {
         if (Objects.isNull(percentage) || percentage == 0 || percentage < -100 )
-            throw new MethodArgumentNotValidException("Percent not in range 0 to 100,-100 to 0 ");
+            throw new MethodArgumentNotValidException("Percent not in range :-100 to 0 or greater than 0");
         Optional<Department> department = departmentRepo.findById(departmentId);
         if (!department.isPresent())
             throw new NotFoundException("NOT FOUND department id-{} " + departmentId);
@@ -189,7 +189,7 @@ public class SalaryService {
     public void updateSalaryByOrganisationPercentage(Long percentage, Integer organisationId)
             throws NotFoundException, MethodArgumentNotValidException {
         if (Objects.isNull(percentage) || percentage == 0 || percentage < -100 )
-            throw new MethodArgumentNotValidException("Percent not in range 1 to 100,-100 to -1 ");
+            throw new MethodArgumentNotValidException("Percent not in range :-100 to 0 or greater than 0");
         Optional<Organisation> organisation = organisationRepo.findById(organisationId);
         if (!organisation.isPresent())
             throw new NotFoundException("NOT FOUND organisation id-{} " + organisationId);
