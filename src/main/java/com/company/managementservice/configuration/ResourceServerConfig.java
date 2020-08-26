@@ -22,8 +22,6 @@ public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
                 .antMatchers("/{employeeId}/update-details").hasAnyRole("SENIOR_MANAGER", "CEO","ADMIN")
                 .antMatchers("/employee/**").hasAnyRole("ADMIN", "CEO")
                 .antMatchers("/{employeeId}/salary/**").hasAnyRole("ADMIN", "CEO")
-                .antMatchers("/update-department/{departmentId}/salary").hasAnyRole("ADMIN", "CEO")
-                .antMatchers("/update-organisation/{organisationId}/salary").hasAnyRole("ADMIN", "CEO")
                 .antMatchers("/department/{departmentId}/remove/**").hasAnyRole("ADMIN")
                 .antMatchers("/department/**").hasAnyRole("ADMIN", "CEO")
                 .antMatchers("/organisation/{organisationId}/update-details").hasRole("ADMIN")

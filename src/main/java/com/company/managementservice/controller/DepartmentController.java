@@ -5,10 +5,13 @@ import com.company.managementservice.exception.NotFoundException;
 import com.company.managementservice.exception.RequestRejectedException;
 import com.company.managementservice.model.dto.DepartmentDto;
 import com.company.managementservice.model.dto.OrganisationDto;
+import com.company.managementservice.model.dto.SalaryUpdateDto;
 import com.company.managementservice.model.entity.Employee;
+import com.company.managementservice.model.enums.IncrementType;
 import com.company.managementservice.model.response.BaseMessageResponse;
 import com.company.managementservice.model.response.ServiceResponse;
 import com.company.managementservice.service.DepartmentService;
+import com.company.managementservice.service.SalaryService;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -30,6 +33,9 @@ public class DepartmentController {
 
     @Autowired
     private DepartmentService departmentService;
+
+    @Autowired
+    private SalaryService salaryService;
 
     @PostMapping
     public ServiceResponse<BaseMessageResponse<DepartmentDto>> saveDepartmentDetails(
@@ -97,7 +103,7 @@ public class DepartmentController {
 
     }
 
-    @DeleteMapping("/{departmentId}/remove")
+    @DeleteMapping("/{departmentId}")
     public ResponseEntity<BaseMessageResponse> removeADepartment(@NotNull @PathVariable Long departmentId)
             throws NotFoundException, RequestRejectedException {
         log.info("DepartmentController : removeDepartmentDetails : Received Request to remove Department Details :{}",
@@ -119,5 +125,23 @@ public class DepartmentController {
                 new BaseMessageResponse<>(departmentService.getAllEmployees(id), HttpStatus.OK, true));
 
     }
+
+    @PutMapping(value = "/{departmentId}/salary")
+    public ResponseEntity<BaseMessageResponse> updateSalaryByDepartmentAbsolute(
+            @Valid @RequestBody SalaryUpdateDto salaryUpdateDto,
+            @lombok.NonNull @PathVariable Long departmentId)
+            throws MethodArgumentNotValidException, NotFoundException {
+        if (salaryUpdateDto.getIncrementType().toUpperCase().equals(IncrementType.ABSOLUTE.name()))
+            salaryService.updateSalaryByDepartment( salaryUpdateDto.getValue(),salaryUpdateDto.getCurrency(),
+                                                    departmentId);
+        else if(salaryUpdateDto.getIncrementType().toUpperCase().equals(IncrementType.PERCENTAGE.name()))
+            salaryService.updateSalaryByDepartmentPercentage(salaryUpdateDto.getValue(), departmentId);
+        else throw new NotFoundException("increment type not found");
+        return new ServiceResponse<BaseMessageResponse>(
+                new BaseMessageResponse(
+                        "Salary Updated Successfully ",
+                        HttpStatus.OK, true));
+    }
+
 
 }

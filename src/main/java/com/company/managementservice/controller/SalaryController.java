@@ -48,7 +48,7 @@ public class SalaryController {
 
     }
 
-    @GetMapping(value = "/{employeeId}/salary/details")
+    @GetMapping(value = "/{employeeId}/salary")
     public ServiceResponse<List<SalaryDto>> getEmployeeSalary(@NonNull @PathVariable Long employeeId)
             throws NotFoundException {
         log.info("SalaryController : getEmployeeSalary  : Received Request to get Employee Salary  :{}", employeeId);
@@ -77,39 +77,6 @@ public class SalaryController {
                 salaryService.getEmployeeCurrentSalary(employeeId), HttpStatus.OK);
 
     }
-
-    @PutMapping(value = "/update-department/{departmentId}/salary")
-    public ResponseEntity<BaseMessageResponse> updateSalaryByDepartmentAbsolute(
-            @Valid @RequestBody SalaryUpdateDto salaryUpdateDto,
-            @NonNull @PathVariable Long departmentId)
-            throws MethodArgumentNotValidException, NotFoundException {
-        if (salaryUpdateDto.getIncrementType().equals(IncrementType.ABSOLUTE))
-            salaryService.updateSalaryByDepartment( salaryUpdateDto.getValue(),salaryUpdateDto.getCurrency(),
-                                                   departmentId);
-        else if(salaryUpdateDto.getIncrementType().equals(IncrementType.PERCENTAGE))
-            salaryService.updateSalaryByDepartmentPercentage(salaryUpdateDto.getValue(), departmentId);
-        return new ServiceResponse<BaseMessageResponse>(
-                new BaseMessageResponse(
-                        "Salary Updated Successfully ",
-                        HttpStatus.OK, true));
-    }
-
-
-    @PutMapping(value = "/update-organisation/{organisationId}/salary")
-    public ResponseEntity<BaseMessageResponse> updateSalaryByOrganisationAbsolute(@Valid @RequestBody SalaryUpdateDto salaryUpdateDto,
-                                                                                  @NonNull @PathVariable
-                                                                                          Integer organisationId)
-            throws NotFoundException, MethodArgumentNotValidException {
-        if (salaryUpdateDto.getIncrementType().equals(IncrementType.ABSOLUTE))
-        salaryService.updateSalaryByOrganisation(salaryUpdateDto.getValue(), salaryUpdateDto.getCurrency(), organisationId);
-        else if(salaryUpdateDto.getIncrementType().equals(IncrementType.PERCENTAGE))
-            salaryService.updateSalaryByOrganisationPercentage(salaryUpdateDto.getValue(), organisationId);
-        return new ServiceResponse<BaseMessageResponse>(
-                new BaseMessageResponse(
-                        "Salary Updated Successfully ",
-                        HttpStatus.OK, true));
-    }
-
 
     @KafkaListener(topics = Constants.TOPIC, groupId = Constants.GROUP_ID,
                    containerFactory = "concurrentKafkaListenerContainerFactory")
