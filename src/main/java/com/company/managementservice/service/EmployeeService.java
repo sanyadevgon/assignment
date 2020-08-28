@@ -182,6 +182,7 @@ EmployeeService {
         employeeInfo.setCreatedBy(employee.get().getCreatedBy());
         employeeInfo.setHireDate(employee.get().getHireDate());
         employeeInfo.setSalaries(employee.get().getSalaries());
+        employeeInfo.setAge(employee.get().getAge());
         employeeRepo.save(employeeInfo);
         cacheService.getEmployeeDepartmentId(employeeId);
         return modelMapper.map(employeeInfo, EmployeeDto.class);
@@ -201,13 +202,15 @@ EmployeeService {
         Set<Salary> salaries = employee.get().getSalaries();
         for (Salary salary: salaries) {
             if (salary.getToDate() == null) {
-                salary.setToDate(LocalDate.now());
+                salary.setToDate(LocalDateTime.now());
                 salaryRepo.save(salary);
             }
         }
         employeeRepo.save(employee.get());
         Long departmentId = employeeRepo.getDepartmentId(employeeId);
-        cacheService.removeEmployeeCache(departmentId, employeeId);
+        if(departmentId!=null) {
+            cacheService.removeEmployeeCache(departmentId, employeeId);
+        }
         employeeRepo.removeEmployee(employeeId);
         authService.removeAuthcache(employee.get());
     }

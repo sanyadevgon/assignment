@@ -21,18 +21,18 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.Objects;
+
 
 @Log4j2
 @RestController
 @Validated
-@RequestMapping(value = "/employee", consumes = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping( consumes = MediaType.APPLICATION_JSON_VALUE)
 public class EmployeeController {
 
     @Autowired
     private EmployeeService employeeService;
 
-    @PostMapping
+    @PostMapping(value = "/employee")
     public ServiceResponse<BaseMessageResponse<EmployeeDto>> saveEmployeeDetails(@Valid @RequestBody EmployeeDto employeeDto,
                                                   BindingResult bindingResult)
             throws MethodArgumentNotValidException {
@@ -52,14 +52,12 @@ public class EmployeeController {
 
     }
 
-    @PutMapping(value = "/{employeeId}/assign-department/{departmentId}/in-organisation/{organisationId}")
+    @PutMapping(value = "/organisation/{organisationId}/assign-department/{departmentId}/{employeeId}")
     public ServiceResponse<BaseMessageResponse<DepartmentDto>> assignEmployeeDepartment(@NonNull @PathVariable Long employeeId,
                                                                                         @NonNull @PathVariable Long departmentId,
                                                                                         @NonNull @PathVariable Integer organisationId
     )
             throws NotFoundException, RequestRejectedException, EmptyBodyException {
-        if (employeeId == 0 || Objects.isNull(employeeId))
-            throw new EmptyBodyException("invalid id for employee ");
         log.info(
                 "EmployeeController : assignEmployeeToDepartment : Received Request to assign Department To Employee:{} :{}"
                 , departmentId, employeeId);
@@ -70,7 +68,7 @@ public class EmployeeController {
 
     }
 
-    @PutMapping(value = "/{employeeId}/freelance/organisation/{organisationId}")
+    @PutMapping(value = "/organisation/{organisationId}/freelance/{employeeId}")
     public ServiceResponse<BaseMessageResponse<DepartmentDto>> assignFreelancerEmployeeOrganisation(@NonNull @PathVariable Long employeeId,
                                                                    @NonNull @PathVariable Integer organisationId
     )
@@ -85,8 +83,8 @@ public class EmployeeController {
 
     }
 
-    @DeleteMapping(value = "/{employeeId}/remove-from-department/{departmentId}")
-    public ServiceResponse<?> removeEmployeeFromDepartment(@NonNull @PathVariable Long departmentId,
+    @DeleteMapping(value = "/department/{departmentId}/{employeeId}")
+    public ServiceResponse<BaseMessageResponse> removeEmployeeFromDepartment(@NonNull @PathVariable Long departmentId,
                                                            @NonNull @PathVariable Long employeeId
     )
             throws NotFoundException, RequestRejectedException {
@@ -101,7 +99,7 @@ public class EmployeeController {
 
     }
 
-    @GetMapping(value = "/{employeeId}/details")
+    @GetMapping(value = "/{employeeId}")
     public ServiceResponse<BaseMessageResponse<EmployeeDto>> getEmployeeDetails(@PathVariable @NonNull Long employeeId)
             throws NotFoundException, RequestRejectedException {
         log.info("EmployeeController : getEmployeeDetails  : Received Request to get Employee Details :{}", employeeId);
@@ -111,8 +109,8 @@ public class EmployeeController {
 
     }
 
-    @PutMapping("/{employeeId}/update-details")
-    public ServiceResponse<?> updateEmployeeDetails(@Valid @RequestBody EmployeeDto employeeDto,
+    @PutMapping(value ="/employee/{employeeId}")
+    public ServiceResponse<BaseMessageResponse<EmployeeDto>> updateEmployeeDetails(@Valid @RequestBody EmployeeDto employeeDto,
                                                     BindingResult bindingResult, @NonNull @PathVariable Long employeeId)
             throws NotFoundException, MethodArgumentNotValidException, RequestRejectedException {
         log.info("EmployeeController : putEmployeeDetails : Received Request to put Employee Details :{}", employeeId);
@@ -129,8 +127,8 @@ public class EmployeeController {
                         HttpStatus.OK, true));
     }
 
-    @DeleteMapping("/{employeeId}/terminate")
-    public ServiceResponse<?> removeAEmployee(@NonNull @PathVariable Long employeeId)
+    @DeleteMapping("/{employeeId}")
+    public ServiceResponse<BaseMessageResponse> removeAEmployee(@NonNull @PathVariable Long employeeId)
             throws NotFoundException, RequestRejectedException {
         log.info("EmployeeController : removeAEmployee: Received Request to remove Employee  :{}", employeeId);
         employeeService.removeEmployee(employeeId);
@@ -140,7 +138,7 @@ public class EmployeeController {
                         HttpStatus.OK, true));
     }
 
-    @GetMapping("/on-bench-list")
+    @GetMapping("/employee/on-bench-list")
     public ServiceResponse<?> employeeOnBench() {
         log.info("EmployeeController : employeeOnBench: Received Request to list Employee on bench");
         return new ServiceResponse<>(

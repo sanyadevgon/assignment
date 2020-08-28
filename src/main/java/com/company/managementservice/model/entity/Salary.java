@@ -8,11 +8,13 @@ import lombok.NoArgsConstructor;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "salary")
 @Data
 @NoArgsConstructor
+
 @AllArgsConstructor
 public class Salary extends AbstractEntity<Long> implements Serializable {
 
@@ -20,13 +22,14 @@ public class Salary extends AbstractEntity<Long> implements Serializable {
     @Column(name = "amount")
     private Integer amount;
 
+    @Enumerated
     @Column(name = "currency")
-    private String currency;
+    private CurrencyType currency;
 
     @Column(name = "from_date")
-    private LocalDate fromDate;
+    private LocalDateTime fromDate;
 
     @Column(name = "to_date")
-    private LocalDate toDate;
+    private LocalDateTime toDate;
 
 }

@@ -1,6 +1,7 @@
 package com.company.managementservice.model.dto;
 
 
+import com.company.managementservice.constant.Constants;
 import com.company.managementservice.model.enums.DesignationType;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
@@ -16,8 +17,6 @@ import java.io.Serializable;
 @NoArgsConstructor
 public class KafkaDto implements Serializable {
 
-
-    //@NotBlank(message = "Please provide a name")
     @JsonProperty("firstName")
     private String firstName;
 
@@ -28,17 +27,33 @@ public class KafkaDto implements Serializable {
     @JsonProperty("designation")
     private DesignationType designationType;
 
+    @Min(value = 18)
+    @Max(value = 65)
+    @JsonProperty("age")
+    private Integer age;
 
+
+    @Pattern(regexp = Constants.EMAIL)
+    @JsonProperty("emailId")
+    private String emailId;
+
+    @JsonProperty("address")
+    private String address;
+
+    @Size(min = 10, max = 10)
+    @Pattern(regexp = Constants.PHONE)
+    @JsonProperty("phone")
+    private String phone;
+
+    @JsonProperty("id")
     private Long id;
 
     @Min(value=0)
     @JsonProperty("amount")
     private Integer amount;
 
-    @Enumerated
     @JsonProperty("currency")
     private String currency;
-
 
 
 }

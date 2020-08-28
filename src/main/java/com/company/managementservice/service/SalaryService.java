@@ -1,7 +1,7 @@
 package com.company.managementservice.service;
 
-import com.company.managementservice.constant.Constants;
 import com.company.managementservice.exception.EmptyBodyException;
+import com.company.managementservice.exception.MethodArgumentNotValidException;
 import com.company.managementservice.exception.NotFoundException;
 import com.company.managementservice.model.dto.KafkaDto;
 import com.company.managementservice.model.dto.SalaryDto;
@@ -9,6 +9,7 @@ import com.company.managementservice.model.entity.Department;
 import com.company.managementservice.model.entity.Employee;
 import com.company.managementservice.model.entity.Organisation;
 import com.company.managementservice.model.entity.Salary;
+import com.company.managementservice.model.enums.CurrencyType;
 import com.company.managementservice.repo.DepartmentRepo;
 import com.company.managementservice.repo.EmployeeRepo;
 import com.company.managementservice.repo.OrganisationRepo;
@@ -32,6 +33,9 @@ import java.util.stream.Collectors;
 public class SalaryService {
 
     @Autowired
+    CurrencyConvertorService currencyConvertorService;
+
+    @Autowired
     private SalaryRepo salaryRepo;
 
     @Autowired
@@ -53,16 +57,21 @@ public class SalaryService {
         if (!employee.isPresent())
             throw new NotFoundException("NOT FOUND employee id-" + id);
         if (employee.get().getTerminatedDate() != null)
-            throw new NotFoundException("Employee is terminated, salary cant be updated");
-        Salary salary = modelMapper.map(salaryDto, Salary.class);
+            throw new NotFoundException("Employee is terminated,salary cant be updated");
         Set<Salary> salaries = employee.get().getSalaries();
         if (!salaries.isEmpty())
             throw new NotFoundException("Salary details already exists, try updating the salary details");
+        Long salaryInRuppe =
+                currencyConvertorService.getRupeeValue(Long.valueOf(salaryDto.getAmount()), salaryDto.getCurrency());
+        Salary salary = new Salary();
+        salary.setAmount(Math.toIntExact(salaryInRuppe));
+        salary.setCurrency(CurrencyType.RUPEES);
+        salary.setFromDate(LocalDateTime.now());
         salaries.add(salary);
         salaryRepo.save(salary);
         employee.get().setSalaries(salaries);
         employeeRepo.save(employee.get());
-        return salaryDto;
+        return modelMapper.map(salary, SalaryDto.class);
     }
 
     public List<SalaryDto> getEmployeeSalary(Long id) throws NotFoundException {
@@ -88,16 +97,20 @@ public class SalaryService {
         log.info("salaryService: UpdateSalary: update the salary of employee in db :{}", employeeId);
         for (Salary s: salaries) {
             if (s.getToDate() == null) {
-                s.setToDate(LocalDate.now());
+                s.setToDate(LocalDateTime.now());
             }
         }
-        Salary salary = modelMapper.map(salaryDto, Salary.class);
-        salary.setFromDate(LocalDate.now());
+        Long salaryInRuppe =
+                currencyConvertorService.getRupeeValue(Long.valueOf(salaryDto.getAmount()), salaryDto.getCurrency());
+        Salary salary = new Salary();
+        salary.setAmount(Math.toIntExact(salaryInRuppe));
+        salary.setCurrency(CurrencyType.RUPEES);
+        salary.setFromDate(LocalDateTime.now());
         salaries.add(salary);
         employee.get().setSalaries(salaries);
         salaryRepo.save(salary);
         employeeRepo.save(employee.get());
-        return salaryDto;
+        return modelMapper.map(salary, SalaryDto.class);
 
     }
 
@@ -110,7 +123,7 @@ public class SalaryService {
         if (employee.get().getTerminatedDate() != null)
             throw new NotFoundException("Employee is terminated, no current salary found");
         log.info("salaryService: getEmployeeCurrentSalary: get the current salary of employee from db :{}", employeeId);
-        Salary currentSalary = new Salary();
+        Salary currentSalary = null;
         Set<Salary> salaries = employee.get().getSalaries();
         for (Salary s: salaries) {
             if (s.getToDate() == null) {
@@ -123,106 +136,123 @@ public class SalaryService {
         return modelMapper.map(currentSalary, SalaryDto.class);
     }
 
-    public void updateSalaryByDepartment(Long inc, Long departmentId) throws EmptyBodyException, NotFoundException {
-        if (inc == 0 || Objects.isNull(inc))
-            throw new EmptyBodyException("invalid data for increment ");
+    public void updateSalaryByDepartment(Long inc, String currency, Long departmentId)
+            throws NotFoundException, MethodArgumentNotValidException {
+        if (Objects.isNull(inc) || inc <= 0)
+            throw new MethodArgumentNotValidException("invalid data for increment ");
+        if(currency==null)
+            throw new MethodArgumentNotValidException("invalid data for increment, provide currency type ");
         Optional<Department> department = departmentRepo.findById(departmentId);
         if (!department.isPresent())
             throw new NotFoundException("NOT FOUND department id-{} " + departmentId);
-        employeeRepo.updateSalaryByDepartment(inc, departmentId);
-        List<Long> employeesId=employeeRepo.getEmployeeId(departmentId);
-        for(Long employeeId: employeesId){
+        Long increment = currencyConvertorService.getRupeeValue(inc, currency);
+        employeeRepo.updateSalaryByDepartment(increment, departmentId);
+        List<Long> employeesId = employeeRepo.getEmployeeId(departmentId);
+        for (Long employeeId: employeesId) {
             cacheService.removeSalaryCacheEmp(employeeId);
             cacheService.removeSalaryCacheDept(departmentId);
         }
     }
 
     public void updateSalaryByDepartmentPercentage(Long percentage, Long departmentId)
-            throws EmptyBodyException, NotFoundException {
-        if (percentage == 0 || Objects.isNull(percentage))
-            throw new EmptyBodyException("invalid data for increment ");
+            throws NotFoundException, MethodArgumentNotValidException {
+        if (Objects.isNull(percentage) || percentage == 0 || percentage < -100 )
+            throw new MethodArgumentNotValidException("Percent not in range :-100 to 0 or greater than 0");
         Optional<Department> department = departmentRepo.findById(departmentId);
         if (!department.isPresent())
             throw new NotFoundException("NOT FOUND department id-{} " + departmentId);
         employeeRepo.updateSalaryByDepartmentPercentage(percentage, departmentId);
-        List<Long> employeesId=employeeRepo.getEmployeeId(departmentId);
-        for(Long employeeId: employeesId){
+        List<Long> employeesId = employeeRepo.getEmployeeId(departmentId);
+        for (Long employeeId: employeesId) {
             cacheService.removeSalaryCacheEmp(employeeId);
             cacheService.removeSalaryCacheDept(departmentId);
         }
     }
 
-    public void updateSalaryByOrganisation(Long inc, Integer organisationId)
-            throws EmptyBodyException, NotFoundException {
-        if (inc == 0 || Objects.isNull(inc))
-            throw new EmptyBodyException("invalid data for increment ");
+    public void updateSalaryByOrganisation(Long inc, String currency, Integer organisationId)
+            throws NotFoundException, MethodArgumentNotValidException {
+        if (Objects.isNull(inc) || inc <= 0)
+            throw new MethodArgumentNotValidException("invalid data for increment ");
+        if(currency==null)
+            throw new MethodArgumentNotValidException("invalid data for increment, provide currency type ");
         Optional<Organisation> organisation = organisationRepo.findById(organisationId);
         if (!organisation.isPresent())
             throw new NotFoundException("NOT FOUND organisation id-{} " + organisationId);
-        employeeRepo.updateSalaryByOrganisation(inc, organisationId);
-        List<Long> employeesId=employeeRepo.getEmployeeIdOrgan(organisationId);
-        for(Long employeeId: employeesId){
+        Long increment = currencyConvertorService.getRupeeValue(inc, currency);
+        employeeRepo.updateSalaryByOrganisation(increment, organisationId);
+        List<Long> employeesId = employeeRepo.getEmployeeIdOrgan(organisationId);
+        for (Long employeeId: employeesId) {
             cacheService.removeSalaryCacheEmp(employeeId);
         }
     }
 
     public void updateSalaryByOrganisationPercentage(Long percentage, Integer organisationId)
-            throws EmptyBodyException, NotFoundException {
-        if (percentage == 0 || Objects.isNull(percentage))
-            throw new EmptyBodyException("invalid data for increment ");
+            throws NotFoundException, MethodArgumentNotValidException {
+        if (Objects.isNull(percentage) || percentage == 0 || percentage < -100 )
+            throw new MethodArgumentNotValidException("Percent not in range :-100 to 0 or greater than 0");
         Optional<Organisation> organisation = organisationRepo.findById(organisationId);
         if (!organisation.isPresent())
             throw new NotFoundException("NOT FOUND organisation id-{} " + organisationId);
         employeeRepo.updateSalaryByOrganisationPercentage(percentage, organisationId);
-        List<Long> employeesId=employeeRepo.getEmployeeIdOrgan(organisationId);
-        for(Long employeeId: employeesId){
+        List<Long> employeesId = employeeRepo.getEmployeeIdOrgan(organisationId);
+        for (Long employeeId: employeesId) {
             cacheService.removeSalaryCacheEmp(employeeId);
         }
     }
 
     @Transactional
     public void updateSalaryThroughKafka(KafkaDto kafkaDto) throws NotFoundException, EmptyBodyException {
-        Long employeeId = kafkaDto.getId();
-        if (Objects.isNull(employeeId))
-            throw new EmptyBodyException("invalid id for employee ");
-        Optional<Employee> employee = employeeRepo.findById(employeeId);
-        if (!employee.isPresent()) {
+        if (kafkaDto.getId()== null) {
+            if (kafkaDto.getFirstName() == null || kafkaDto.getPhone() == null || kafkaDto.getAddress() == null ||
+                kafkaDto.getDesignationType() == null || kafkaDto.getAmount() == null) {
+                log.info("Please provide firstName,phone,address designation and amount");
+                throw new EmptyBodyException("Please provide firstName,phone, address, designation and amount");
+            }
             Employee employee1 = new Employee();
             employee1.setFirstName(kafkaDto.getFirstName());
             employee1.setLastName(kafkaDto.getLastName());
             employee1.setDesignationType(kafkaDto.getDesignationType());
             employee1.setIsActive(true);
-            employee1.setCreatedAt(LocalDateTime.now());
-            employee1.setCreatedBy(Constants.ADMIN);
+            employee1.setPhone(kafkaDto.getPhone());
+            employee1.setAge(kafkaDto.getAge());
+            employee1.setAddress(kafkaDto.getAddress());
+            Long salaryInRuppe =
+                    currencyConvertorService.getRupeeValue(Long.valueOf(kafkaDto.getAmount()), kafkaDto.getCurrency());
             Salary salary = new Salary();
-            salary.setAmount(kafkaDto.getAmount());
-            salary.setCurrency(kafkaDto.getCurrency());
-            salary.setFromDate(LocalDate.now());
+            salary.setAmount(Math.toIntExact(salaryInRuppe));
+            salary.setCurrency(CurrencyType.RUPEES);
+            salary.setFromDate(LocalDateTime.now());
             Set<Salary> salaries = new HashSet<Salary>();
-            employeeRepo.save(employee1);
             salaries.add(salary);
-            salaryRepo.save(salary);
             employee1.setSalaries(salaries);
-
+            employeeRepo.save(employee1);
         } else {
+
+            Optional<Employee> employee = employeeRepo.findById(kafkaDto.getId());
+            if (!employee.isPresent())
+                throw new NotFoundException("Employee not found");
             if (employee.get().getTerminatedDate() != null)
                 throw new NotFoundException("Employee is terminated, salary cant be updated");
+            if(kafkaDto.getAmount()==null)
+                throw new EmptyBodyException("Please provide amount");
             Set<Salary> salaries = employee.get().getSalaries();
             log.info("salaryService: updateSalaryThroughKafka: Kafka update the salary of employee in db :{}",
-                     employeeId);
+                     kafkaDto.getId());
             for (Salary s: salaries) {
                 if (s.getToDate() == null) {
-                    s.setToDate(LocalDate.now());
+                    s.setToDate(LocalDateTime.now());
                 }
             }
+            Long salaryInRuppe =
+                    currencyConvertorService.getRupeeValue(Long.valueOf(kafkaDto.getAmount()), kafkaDto.getCurrency());
             Salary salary = new Salary();
-            salary.setAmount(kafkaDto.getAmount());
-            salary.setCurrency(kafkaDto.getCurrency());
-            salary.setFromDate(LocalDate.now());
+            salary.setAmount(Math.toIntExact(salaryInRuppe));
+            salary.setCurrency(CurrencyType.RUPEES);
+            salary.setFromDate(LocalDateTime.now());
             salaries.add(salary);
             salaryRepo.save(salary);
             employee.get().setSalaries(salaries);
-            cacheService.updateSalaryCache(employeeId,salary.getId());
+            cacheService.updateSalaryCache(kafkaDto.getId(), salary.getId());
         }
     }
 

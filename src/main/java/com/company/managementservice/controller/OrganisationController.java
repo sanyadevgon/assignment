@@ -6,9 +6,12 @@ import com.company.managementservice.exception.MethodArgumentNotValidException;
 import com.company.managementservice.exception.NotFoundException;
 import com.company.managementservice.model.dto.OrganisationDto;
 import com.company.managementservice.model.dto.OrganisationInfoDto;
+import com.company.managementservice.model.dto.SalaryUpdateDto;
+import com.company.managementservice.model.enums.IncrementType;
 import com.company.managementservice.model.response.BaseMessageResponse;
 import com.company.managementservice.model.response.ServiceResponse;
 import com.company.managementservice.service.OrganisationService;
+import com.company.managementservice.service.SalaryService;
 import lombok.NonNull;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +35,9 @@ public class OrganisationController {
 
     @Autowired
     private OrganisationService organisationService;
+
+    @Autowired
+    private SalaryService salaryService;
 
     @PostMapping
     public ResponseEntity<OrganisationDto> saveOrganisationDetails(
@@ -101,7 +107,7 @@ public class OrganisationController {
                         HttpStatus.OK, true));
     }
 
-    @DeleteMapping("/{id}/remove-organisation")
+    @DeleteMapping("/{id}")
     public ResponseEntity<BaseMessageResponse> removeOrganisation(@NonNull @PathVariable Integer id)
             throws NotFoundException {
         log.info(
@@ -132,6 +138,23 @@ public class OrganisationController {
         return new ServiceResponse<>(
                 new BaseMessageResponse(organisationService.getOrganisationInfo(id), HttpStatus.OK, true));
 
+    }
+
+    @PutMapping(value = "/{organisationId}/salary")
+    public ResponseEntity<BaseMessageResponse> updateSalaryByOrganisationAbsolute(@Valid @RequestBody
+                                                                                          SalaryUpdateDto salaryUpdateDto,
+                                                                                  @NonNull @PathVariable
+                                                                                          Integer organisationId)
+            throws NotFoundException, MethodArgumentNotValidException {
+        if (salaryUpdateDto.getIncrementType().toUpperCase().equals(IncrementType.ABSOLUTE.name()))
+            salaryService.updateSalaryByOrganisation(salaryUpdateDto.getValue(), salaryUpdateDto.getCurrency(), organisationId);
+        else if(salaryUpdateDto.getIncrementType().toUpperCase().equals(IncrementType.PERCENTAGE.name()))
+            salaryService.updateSalaryByOrganisationPercentage(salaryUpdateDto.getValue(), organisationId);
+        else throw new NotFoundException("increment type not found");
+        return new ServiceResponse<BaseMessageResponse>(
+                new BaseMessageResponse(
+                        "Salary Updated Successfully ",
+                        HttpStatus.OK, true));
     }
 
 }

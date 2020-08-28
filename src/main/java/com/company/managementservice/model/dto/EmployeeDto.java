@@ -1,7 +1,9 @@
 package com.company.managementservice.model.dto;
 
-import com.company.managementservice.model.entity.Salary;
+import com.company.managementservice.constant.Constants;
 import com.company.managementservice.model.enums.DesignationType;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -11,7 +13,6 @@ import javax.persistence.Enumerated;
 import javax.validation.constraints.*;
 import java.io.Serializable;
 import java.time.LocalDate;
-import java.util.Set;
 
 @Data
 @AllArgsConstructor
@@ -26,7 +27,7 @@ public class EmployeeDto implements Serializable {
     private String lastName;
 
     @NotBlank(message = "Please provide an email")
-    @Pattern(regexp = "^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$")
+    @Pattern(regexp = Constants.EMAIL)
     @JsonProperty("emailId")
     private String emailId;
 
@@ -35,7 +36,7 @@ public class EmployeeDto implements Serializable {
     private String address;
 
     @Size(min = 10, max = 10)
-    @Pattern(regexp = "^[1-9][0-9]*${9}")
+    @Pattern(regexp = Constants.PHONE)
     @JsonProperty("phone")
     private String phone;
 
@@ -51,12 +52,15 @@ public class EmployeeDto implements Serializable {
     @JsonProperty("is_active")
     private Boolean isActive = true;
 
+    @JsonFormat(pattern = Constants.DATE)
     @JsonProperty("hireDate")
     private LocalDate hireDate = LocalDate.now();
 
     private Long id;
 
+    @JsonFormat(pattern = Constants.DATE)
     @JsonProperty("terminatedDate")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private LocalDate terminatedDate;
 
 }

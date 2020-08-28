@@ -1,6 +1,7 @@
 package com.company.managementservice.model.entity;
 
 import com.company.managementservice.constant.Constants;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
@@ -24,6 +25,7 @@ public abstract class AbstractEntity<T> {
 
 
     @JsonIgnore
+    @JsonFormat(pattern = Constants.TIMESTAMP)
     private LocalDateTime createdAt;
 
     @JsonIgnore

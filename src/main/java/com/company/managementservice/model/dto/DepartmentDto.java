@@ -1,6 +1,7 @@
 package com.company.managementservice.model.dto;
 
 import com.company.managementservice.model.entity.Employee;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -29,5 +30,6 @@ public class DepartmentDto implements Serializable {
 
     private Long id;
 
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private Set<EmployeeDto> employees;
 }
